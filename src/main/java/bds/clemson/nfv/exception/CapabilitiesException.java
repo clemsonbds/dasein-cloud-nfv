@@ -1,4 +1,4 @@
-package bds.clemson.nfv;
+package bds.clemson.nfv.exception;
 
 @SuppressWarnings("serial")
 public class CapabilitiesException extends Exception {

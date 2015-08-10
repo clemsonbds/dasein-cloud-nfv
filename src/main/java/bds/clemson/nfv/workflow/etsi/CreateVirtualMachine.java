@@ -1,4 +1,4 @@
-package bds.clemson.nfv.vm;
+package bds.clemson.nfv.workflow.etsi;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -34,28 +34,60 @@ import org.dasein.cloud.network.VLANSupport;
 import org.dasein.util.uom.storage.Gigabyte;
 import org.dasein.util.uom.storage.Storage;
 
-import bds.clemson.nfv.CapabilitiesException;
-import bds.clemson.nfv.ConfigurationException;
-import bds.clemson.nfv.ExecutionException;
-import bds.clemson.nfv.ProviderLoader;
-import bds.clemson.nfv.ResourcesException;
+import bds.clemson.nfv.exception.CapabilitiesException;
+import bds.clemson.nfv.exception.ConfigurationException;
+import bds.clemson.nfv.exception.ExecutionException;
+import bds.clemson.nfv.exception.ResourcesException;
+import bds.clemson.nfv.exception.UsageException;
+import bds.clemson.nfv.workflow.ListSupportedArchitectures;
+import bds.clemson.nfv.workflow.Operation;
 
-public class CreateVirtualMachine {
+public class CreateVirtualMachine extends Operation {
+
+	private String hostName;
+	private String friendlyName;
+	private String architectureName;
+	private String productName;
+
+	private VirtualMachine launched;
 
 	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, CloudException, InternalException, IOException {
-		String providerPropertiesFilename = args[0] + ".properties";
-		ProviderLoader loader = new ProviderLoader(providerPropertiesFilename);
 
-        CreateVirtualMachine command = new CreateVirtualMachine(loader.getConfiguredProvider());
+        CreateVirtualMachine command = null;
 
         try {
-        	String hostName = args[1];
-        	String friendlyName = args[2];
-        	command.execute(hostName, friendlyName);
-            System.out.println("Launched: " + command.getLaunched().getName() + "[" + command.getLaunched().getProviderVirtualMachineId() + "] (" + command.getLaunched().getCurrentState() + ")");
-            System.out.println("Launch complete (" + command.getLaunched().getCurrentState() + ")");
+        	if (args.length != 5)
+        		throw new UsageException();
+        	
+        	CloudProvider provider = configureProvider(args[0]);
+        	command = new CreateVirtualMachine(provider);
 
+        	// parse args to instance variables
+        	command.hostName = args[1];
+        	command.friendlyName = args[2];
+        	command.architectureName = args[3];
+        	command.productName = args[4];
+        	
+        	// execute command
+        	command.execute();
+
+        	// deal with results
+//        	System.out.println("Launched: " + command.getLaunched().getName() + "[" + command.getLaunched().getProviderVirtualMachineId() + "] (" + command.getLaunched().getCurrentState() + ")");
+//            System.out.println("Launch complete (" + command.getLaunched().getCurrentState() + ")");
+
+        	System.out.println(command.getLaunched().getProviderVirtualMachineId());
         }
+        catch (UsageException e) {
+    		System.out.println("usage: "
+    				+ ListSupportedArchitectures.class.getName()
+    				+ " <cloud name>"
+    				+ " <hostName>"
+    				+ " <friendlyName>"
+    				+ " <architecture>"
+    				+ " <product>"
+    		);
+    		System.out.println(e.getMessage());
+		}
         catch (ConfigurationException e) {
             System.err.println("An error occurred with the provider configuration: " + e.getMessage());
 			e.printStackTrace();
@@ -81,16 +113,15 @@ public class CreateVirtualMachine {
             e.printStackTrace();
         }
         finally {
-            command.provider.close();
+        	if (command != null)
+        		command.provider.close();
         }
 	}
 
-    private CloudProvider provider;
-	private VirtualMachine launched;
     
     public CreateVirtualMachine(CloudProvider provider) { this.provider = provider; }
 
-    public void execute(String hostName, String friendlyName) throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
+    public void execute() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
         // see if the cloud provider has any compute services
         ComputeServices compute = provider.getComputeServices();
 
@@ -108,23 +139,30 @@ public class CreateVirtualMachine {
         if( imgSupport == null )
             throw new CapabilitiesException(provider.getCloudName() + " does not support machine images.");
 
-        // launch a vm
-        VirtualMachineProduct product = null;
+        // find a target architecture and VM product
         Architecture targetArchitecture = null;
 
         for( Architecture architecture : vmSupport.getCapabilities().listSupportedArchitectures() ) {
-            Iterator<VirtualMachineProduct> supported = vmSupport.listProducts(architecture).iterator();
-
-            if( supported.hasNext() ) {
-                product = supported.next();
+        	if (architectureName.equals(architecture.toString())) {
                 targetArchitecture = architecture;
                 break;
-            }
-        }
-        if( product == null ) {
-            throw new ConfigurationException("Unable to identify a product to use");
+        	}
         }
 
+        if (targetArchitecture == null)
+        	throw new CapabilitiesException(provider.getCloudName() + " does not support the " + architectureName + " architecture.");
+
+        VirtualMachineProduct product = null;
+
+        for (VirtualMachineProduct p: vmSupport.listProducts(targetArchitecture)) {
+        	if (productName.equals(p.getProviderProductId())) {
+        		product = p;
+        		break;
+        	}
+        }
+
+        if(product == null)
+            throw new CapabilitiesException("No VM products available for the " + targetArchitecture + " architecture.");
 
         Platform platform = Platform.UNKNOWN;
         String machineImageId = null;
@@ -252,7 +290,8 @@ public class CreateVirtualMachine {
             }
         }
 
-        VirtualMachine launching = vmSupport.launch(options);
+        VirtualMachine launching = null;
+//        launching = vmSupport.launch(options);
 
         while( launching != null && launching.getCurrentState().equals(VmState.PENDING) ) {
             try { Thread.sleep(5000L); }
