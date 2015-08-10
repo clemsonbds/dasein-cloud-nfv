@@ -1,74 +1,50 @@
 package bds.clemson.nfv.workflow.etsi;
 
-import java.io.IOException;
-
 import org.dasein.cloud.CloudException;
-import org.dasein.cloud.CloudProvider;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.compute.ComputeServices;
 import org.dasein.cloud.compute.VirtualMachine;
 import org.dasein.cloud.compute.VirtualMachineSupport;
 
-import bds.clemson.nfv.ProviderLoader;
+import bds.clemson.nfv.exception.CapabilitiesException;
+import bds.clemson.nfv.exception.ConfigurationException;
+import bds.clemson.nfv.exception.ExecutionException;
+import bds.clemson.nfv.exception.ResourcesException;
+import bds.clemson.nfv.workflow.Operation;
 
-public class ListVirtualMachines {
+public class ListVirtualMachines extends Operation {
 
-	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, CloudException, InternalException, IOException {
-		String providerPropertiesFilename = args[0] + ".properties";
-		ProviderLoader loader = new ProviderLoader(providerPropertiesFilename);
-
-		ListVirtualMachines command = new ListVirtualMachines(loader.getConfiguredProvider());
-
-        try {
-            command.execute(args);
-        }
-        finally {
-            command.provider.close();
-        }
+	protected void mapArguments(String[] args) {
+		providerName = args[0];
+	}
+	
+	protected void usage() {
+		System.out.println("usage: "
+				+ ListVirtualMachines.class.getName()
+				+ " <cloud name>"
+		);
+	}
+	
+	public static void main(String[] args) {
+		ListVirtualMachines operation = new ListVirtualMachines();
+		operation.execute(args);
 	}
 
-    private CloudProvider provider;
-
-    public ListVirtualMachines(CloudProvider provider) { this.provider = provider; }
-
-    public void execute(String[] args) {
-        	
-    	// see if the cloud provider has any compute services
+    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
+        // see if the cloud provider has any compute services
         ComputeServices compute = provider.getComputeServices();
 
-        if( compute == null ) {
-            System.out.println(provider.getCloudName() + " does not support any compute services.");
-        }
-        else {
-            // see if it specifically supports virtual machines
-            VirtualMachineSupport vmSupport = compute.getVirtualMachineSupport();
+        if( compute == null )
+            throw new CapabilitiesException(provider.getCloudName() + " does not support any compute services.");
 
-            if( vmSupport == null ) {
-                System.out.println(provider.getCloudName() + " does not support virtual machines.");
-            }
-            else {
-                //enumerate the VMs
-                try {
-                    int count = 0;
+        // see if it specifically supports virtual machines
+        VirtualMachineSupport vmSupport = compute.getVirtualMachineSupport();
 
-                    System.out.println("Virtual machines in " + provider.getCloudName() + ":");
-                    for( VirtualMachine vm : vmSupport.listVirtualMachines() ) {
-                        count++;
-                        System.out.println("\t" + vm.getName() + "[" + vm.getProviderVirtualMachineId() + "] (" + vm.getCurrentState() + ")");
-                    }
-                    System.out.println("Total: " + count);
-                }
-                catch( CloudException e ) {
-                    System.err.println("An error occurred with the cloud provider: " + e.getMessage());
-                    e.printStackTrace();
-                }
-                catch( InternalException e ) {
-                    System.err.println("An error occurred inside Dasein Cloud: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }
+        if( vmSupport == null )
+            throw new CapabilitiesException(provider.getCloudName() + " does not support virtual machines.");
+
+        for( VirtualMachine vm : vmSupport.listVirtualMachines() ) {
+            System.out.println(vm.getName() + " [" + vm.getProviderVirtualMachineId() + "] (" + vm.getCurrentState() + ")");
         }
-    	
-    	
     }
 }

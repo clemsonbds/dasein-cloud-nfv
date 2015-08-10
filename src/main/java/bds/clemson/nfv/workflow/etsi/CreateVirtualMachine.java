@@ -1,10 +1,8 @@
 package bds.clemson.nfv.workflow.etsi;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 import org.dasein.cloud.CloudException;
-import org.dasein.cloud.CloudProvider;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.Requirement;
 import org.dasein.cloud.compute.Architecture;
@@ -38,8 +36,6 @@ import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
-import bds.clemson.nfv.exception.UsageException;
-import bds.clemson.nfv.workflow.ListSupportedArchitectures;
 import bds.clemson.nfv.workflow.Operation;
 
 public class CreateVirtualMachine extends Operation {
@@ -51,77 +47,35 @@ public class CreateVirtualMachine extends Operation {
 
 	private VirtualMachine launched;
 
-	public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, CloudException, InternalException, IOException {
+	protected void mapArguments(String[] args) {
+		providerName = args[0];
+    	hostName = args[1];
+    	friendlyName = args[2];
+    	architectureName = args[3];
+    	productName = args[4];
+	}
+	
+	protected void usage() {
+		System.out.println("usage: "
+				+ CreateVirtualMachine.class.getName()
+				+ " <cloud name>"
+				+ " <hostName>"
+				+ " <friendlyName>"
+				+ " <architecture>"
+				+ " <product>"
+		);
+	}
+	
+	public static void main(String[] args) {
+		CreateVirtualMachine operation = new CreateVirtualMachine();
+		operation.execute(args);
 
-        CreateVirtualMachine command = null;
-
-        try {
-        	if (args.length != 5)
-        		throw new UsageException();
-        	
-        	CloudProvider provider = configureProvider(args[0]);
-        	command = new CreateVirtualMachine(provider);
-
-        	// parse args to instance variables
-        	command.hostName = args[1];
-        	command.friendlyName = args[2];
-        	command.architectureName = args[3];
-        	command.productName = args[4];
-        	
-        	// execute command
-        	command.execute();
-
-        	// deal with results
-//        	System.out.println("Launched: " + command.getLaunched().getName() + "[" + command.getLaunched().getProviderVirtualMachineId() + "] (" + command.getLaunched().getCurrentState() + ")");
-//            System.out.println("Launch complete (" + command.getLaunched().getCurrentState() + ")");
-
-        	System.out.println(command.getLaunched().getProviderVirtualMachineId());
-        }
-        catch (UsageException e) {
-    		System.out.println("usage: "
-    				+ ListSupportedArchitectures.class.getName()
-    				+ " <cloud name>"
-    				+ " <hostName>"
-    				+ " <friendlyName>"
-    				+ " <architecture>"
-    				+ " <product>"
-    		);
-    		System.out.println(e.getMessage());
-		}
-        catch (ConfigurationException e) {
-            System.err.println("An error occurred with the provider configuration: " + e.getMessage());
-			e.printStackTrace();
-		}
-        catch (CapabilitiesException e) {
-            System.err.println("An error occurred with the expected capabilities: " + e.getMessage());
-            e.printStackTrace();
-		}
-        catch (ResourcesException e) {
-            System.err.println("An error occurred with the provider resources: " + e.getMessage());
-			e.printStackTrace();
-		}
-        catch (ExecutionException e) {
-            System.err.println("An error occurred with the execution: " + e.getMessage());
-			e.printStackTrace();
-		}
-        catch( CloudException e ) {
-            System.err.println("An error occurred with the cloud provider: " + e.getMessage());
-            e.printStackTrace();
-        }
-        catch( InternalException e ) {
-            System.err.println("An error occurred inside Dasein Cloud: " + e.getMessage());
-            e.printStackTrace();
-        }
-        finally {
-        	if (command != null)
-        		command.provider.close();
-        }
+//    	System.out.println("Launched: " + command.getLaunched().getName() + "[" + command.getLaunched().getProviderVirtualMachineId() + "] (" + command.getLaunched().getCurrentState() + ")");
+//      System.out.println("Launch complete (" + command.getLaunched().getCurrentState() + ")");
+		System.out.println(operation.getLaunched().getProviderVirtualMachineId());
 	}
 
-    
-    public CreateVirtualMachine(CloudProvider provider) { this.provider = provider; }
-
-    public void execute() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
+    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
         // see if the cloud provider has any compute services
         ComputeServices compute = provider.getComputeServices();
 
