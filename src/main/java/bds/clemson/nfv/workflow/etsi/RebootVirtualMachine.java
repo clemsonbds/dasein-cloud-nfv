@@ -12,7 +12,6 @@ import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
-import bds.clemson.nfv.workflow.ListVMProducts;
 import bds.clemson.nfv.workflow.Operation;
 
 /**
