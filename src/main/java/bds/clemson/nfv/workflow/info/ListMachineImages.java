@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow;
+package bds.clemson.nfv.workflow.info;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.CloudProvider;
@@ -19,6 +19,7 @@ import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
+import bds.clemson.nfv.workflow.Operation;
 
 public class ListMachineImages extends Operation {
 
@@ -30,7 +31,7 @@ public class ListMachineImages extends Operation {
 	
 	protected void usage() {
 		System.out.println("usage: "
-				+ ListMachineImages.class.getName()
+				+ this.getClass().getName()
 				+ " <cloud name>"
 				+ " <architecture>"
 		);

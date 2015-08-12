@@ -1,37 +1,32 @@
-package bds.clemson.nfv.workflow;
+package bds.clemson.nfv.workflow.info;
 
 import org.dasein.cloud.CloudException;
-import org.dasein.cloud.CloudProvider;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.compute.Architecture;
 import org.dasein.cloud.compute.ComputeServices;
-import org.dasein.cloud.compute.VirtualMachineProduct;
 import org.dasein.cloud.compute.VirtualMachineSupport;
 
 import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
-import bds.clemson.nfv.exception.UsageException;
+import bds.clemson.nfv.workflow.Operation;
 
-public class ListVMProducts extends Operation {
+public class ListSupportedArchitectures extends Operation {
 
-	private String architectureName;
-	
 	protected void mapArguments(String[] args) {
-		architectureName = args[0];
+		// none
 	}
 	
 	protected void usage() {
 		System.out.println("usage: "
-				+ ListVMProducts.class.getName()
+				+ this.getClass().getName()
 				+ " <cloud name>"
-				+ " <architecture>"
 		);
 	}
 	
 	public static void main(String[] args) {
-		ListVMProducts operation = new ListVMProducts();
+		ListSupportedArchitectures operation = new ListSupportedArchitectures();
 		operation.execute(args);
 	}
 
@@ -48,21 +43,8 @@ public class ListVMProducts extends Operation {
         if( vmSupport == null )
             throw new CapabilitiesException(provider.getCloudName() + " does not support virtual machines.");
 
-        // find a target architecture and VM product
-        Architecture targetArchitecture = null;
-
         for( Architecture architecture : vmSupport.getCapabilities().listSupportedArchitectures() ) {
-        	if (architectureName.equals(architecture.toString())) {
-                targetArchitecture = architecture;
-                break;
-        	}
-        }
-
-        if (targetArchitecture == null)
-        	throw new CapabilitiesException(provider.getCloudName() + " does not support the " + architectureName + " architecture.");
-
-        for (VirtualMachineProduct product: vmSupport.listProducts(targetArchitecture)) {
-        	System.out.println(product.getProviderProductId() + ", " + product.getName() + ", " + product.getDescription());
+        	System.out.println(architecture);
         }
     }
 }

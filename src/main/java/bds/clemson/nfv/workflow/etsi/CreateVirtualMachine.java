@@ -56,7 +56,7 @@ public class CreateVirtualMachine extends Operation {
 	
 	protected void usage() {
 		System.out.println("usage: "
-				+ CreateVirtualMachine.class.getName()
+				+ this.getClass().getName()
 				+ " <cloud name>"
 				+ " <hostName>"
 				+ " <friendlyName>"

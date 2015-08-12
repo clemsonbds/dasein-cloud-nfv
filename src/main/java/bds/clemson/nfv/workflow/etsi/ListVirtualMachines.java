@@ -20,7 +20,7 @@ public class ListVirtualMachines extends Operation {
 	
 	protected void usage() {
 		System.out.println("usage: "
-				+ ListVirtualMachines.class.getName()
+				+ this.getClass().getName()
 				+ " <cloud name>"
 		);
 	}
