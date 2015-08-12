@@ -1,6 +1,7 @@
 package bds.clemson.nfv.workflow.etsi;
 
 import java.util.Iterator;
+import java.util.Properties;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
@@ -36,6 +37,8 @@ import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
+import bds.clemson.nfv.exception.UsageException;
+import bds.clemson.nfv.workflow.Configuration;
 import bds.clemson.nfv.workflow.Operation;
 
 public class CreateVirtualMachine extends Operation {
@@ -47,27 +50,16 @@ public class CreateVirtualMachine extends Operation {
 
 	private VirtualMachine launched;
 
-	protected void mapArguments(String[] args) {
-    	hostName = args[0];
-    	friendlyName = args[1];
-    	architectureName = args[2];
-    	productName = args[3];
-	}
-	
-	protected void usage() {
-		System.out.println("usage: "
-				+ this.getClass().getName()
-				+ " <cloud name>"
-				+ " <hostName>"
-				+ " <friendlyName>"
-				+ " <architecture>"
-				+ " <product>"
-		);
+	protected void mapProperties(Properties prop) throws UsageException {
+		hostName = Configuration.map(prop, "DSN_CMD_HOSTNAME", Configuration.Requirement.REQUIRED);
+		friendlyName = Configuration.map(prop, "DSN_CMD_FRIENDLYNAME", Configuration.Requirement.REQUIRED);
+		architectureName = Configuration.map(prop, "DSN_CMD_ARCHITECTURE", Configuration.Requirement.REQUIRED);
+		productName = Configuration.map(prop, "DSN_CMD_PRODUCT", Configuration.Requirement.REQUIRED);
 	}
 	
 	public static void main(String[] args) {
 		CreateVirtualMachine operation = new CreateVirtualMachine();
-		operation.execute(args);
+		operation.execute();
 
 //    	System.out.println("Launched: " + command.getLaunched().getName() + "[" + command.getLaunched().getProviderVirtualMachineId() + "] (" + command.getLaunched().getCurrentState() + ")");
 //      System.out.println("Launch complete (" + command.getLaunched().getCurrentState() + ")");

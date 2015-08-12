@@ -1,5 +1,7 @@
 package bds.clemson.nfv.workflow.etsi;
 
+import java.util.Properties;
+
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.compute.ComputeServices;
@@ -12,6 +14,8 @@ import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
+import bds.clemson.nfv.exception.UsageException;
+import bds.clemson.nfv.workflow.Configuration;
 import bds.clemson.nfv.workflow.Operation;
 
 /**
@@ -27,21 +31,13 @@ public class StartVirtualMachine extends Operation {
 	private String vmId;
 	 String newState= "start";
 	
-	protected void mapArguments(String[] args) {
-		vmId = args[0];
-	}
-	
-	protected void usage() {
-		System.out.println("usage: "
-				+ this.getClass().getName()
-				+ " <cloud name>"
-				+ " <Virtual Machine Id>"
-		);
+	protected void mapProperties(Properties prop) throws UsageException {
+		vmId = Configuration.map(prop, "DSN_CMD_VMID", Configuration.Requirement.REQUIRED);
 	}
 	
 	public static void main(String[] args) {
 		StartVirtualMachine operation = new StartVirtualMachine();
-		operation.execute(args);
+		operation.execute();
 	}
 
     protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {

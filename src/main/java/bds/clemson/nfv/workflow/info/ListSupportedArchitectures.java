@@ -1,5 +1,7 @@
 package bds.clemson.nfv.workflow.info;
 
+import java.util.Properties;
+
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.compute.Architecture;
@@ -10,24 +12,18 @@ import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
+import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Operation;
 
 public class ListSupportedArchitectures extends Operation {
 
-	protected void mapArguments(String[] args) {
+	protected void mapProperties(Properties prop) throws UsageException {
 		// none
-	}
-	
-	protected void usage() {
-		System.out.println("usage: "
-				+ this.getClass().getName()
-				+ " <cloud name>"
-		);
 	}
 	
 	public static void main(String[] args) {
 		ListSupportedArchitectures operation = new ListSupportedArchitectures();
-		operation.execute(args);
+		operation.execute();
 	}
 
     protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {

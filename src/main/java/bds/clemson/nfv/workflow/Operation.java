@@ -20,33 +20,24 @@ import bds.clemson.nfv.exception.UsageException;
 public abstract class Operation {
 	protected CloudProvider provider;
 
-    protected abstract void mapArguments(String[] args);
-    protected abstract void usage();
+    protected abstract void mapProperties(Properties prop) throws UsageException;
     protected abstract void executeInternal() throws UsageException, InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException;
 
-    protected void execute(String[] args) {
+    protected void execute() {
 		try {
-	    	// parse args to instance variables
-			try {
-				mapArguments(args);
-			}
-			catch (ArrayIndexOutOfBoundsException e) {
-				throw new UsageException("Not enough arguments.");
-			}
-
 			Properties providerProperties = new Properties();
 
 			String providerPropertiesPath = System.getProperty("DSN_PROPERTIES", null);
 			if (providerPropertiesPath == null)
-				throw new UsageException("DSN_PROPERTIES not set.");
+				throw new ConfigurationException("DSN_PROPERTIES not set.");
 
 			try {
 				FileReader reader = new FileReader(providerPropertiesPath);
 				providerProperties.load(reader);
 			} catch (FileNotFoundException e) {
-				throw new ConfigurationException("Cannot find properties file.");
+				throw new ConfigurationException("Cannot find properties file at " + providerPropertiesPath + ".");
 			} catch (IOException e) {
-				throw new ConfigurationException("Unable to read properties file.");
+				throw new ConfigurationException("Unable to read properties file at " + providerPropertiesPath + ".");
 			}
 				
 	    	try {
@@ -65,14 +56,15 @@ public abstract class Operation {
 	    	catch (UnsupportedEncodingException e) {
 				throw new ConfigurationException(e.getMessage());
 			}
-	    	
+
+	    	// parse environment variables to instance variables
+			mapProperties(System.getProperties());
+
 	    	// execute command
 	    	executeInternal();
 	    }
 	    catch (UsageException e) {
-	    	usage();
-			if (e.getMessage() != null)
-				System.out.println(e.getMessage());
+	        System.err.println("An error occurred with the command configuration: " + e.getMessage());
 			e.printStackTrace();
 		}
 	    catch (ConfigurationException e) {
