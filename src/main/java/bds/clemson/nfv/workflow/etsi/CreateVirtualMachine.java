@@ -115,8 +115,8 @@ public class CreateVirtualMachine extends Operation {
         	}
         }
 
-        if(product == null)
-            throw new CapabilitiesException("No VM products available for the " + targetArchitecture + " architecture.");
+        if (product == null)
+            throw new CapabilitiesException(provider.getCloudName() + " does not have a '" + productName + "' product for the " + targetArchitecture + " architecture.");
 
         Platform platform = Platform.UNKNOWN;
         String machineImageId = null;
