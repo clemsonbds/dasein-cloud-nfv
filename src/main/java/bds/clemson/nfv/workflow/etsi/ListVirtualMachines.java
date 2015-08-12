@@ -15,7 +15,7 @@ import bds.clemson.nfv.workflow.Operation;
 public class ListVirtualMachines extends Operation {
 
 	protected void mapArguments(String[] args) {
-		providerName = args[0];
+		// none
 	}
 	
 	protected void usage() {

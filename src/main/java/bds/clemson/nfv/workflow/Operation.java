@@ -1,6 +1,10 @@
 package bds.clemson.nfv.workflow;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.CloudProvider;
@@ -14,7 +18,6 @@ import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 
 public abstract class Operation {
-	protected String providerName;
 	protected CloudProvider provider;
 
     protected abstract void mapArguments(String[] args);
@@ -31,12 +34,27 @@ public abstract class Operation {
 				throw new UsageException("Not enough arguments.");
 			}
 
+			Properties providerProperties = new Properties();
+
+			String providerPropertiesPath = System.getProperty("DSN_PROPERTIES", null);
+			if (providerPropertiesPath == null)
+				throw new UsageException("DSN_PROPERTIES not set.");
+
+			try {
+				FileReader reader = new FileReader(providerPropertiesPath);
+				providerProperties.load(reader);
+			} catch (FileNotFoundException e) {
+				throw new ConfigurationException("Cannot find properties file.");
+			} catch (IOException e) {
+				throw new ConfigurationException("Unable to read properties file.");
+			}
+				
 	    	try {
-				ProviderLoader loader = new ProviderLoader(providerName + ".properties");
+	    		ProviderLoader loader = new ProviderLoader(providerProperties);
 				provider = loader.getConfiguredProvider();
 			}
 	    	catch (ClassNotFoundException e) {
-				throw new UsageException(providerName + " is not a valid provider, is the JAR in the classpath?");
+				throw new UsageException("Provider " + providerProperties.getProperty("DSN_PROVIDER_CLASS", "<null>") + " not found, is the JAR in the classpath?");
 	    	}
 			catch (IllegalAccessException e) {
 				throw new InternalException(e);
@@ -44,7 +62,7 @@ public abstract class Operation {
 			catch (InstantiationException e) {
 				throw new InternalException(e);
 			}
-	    	catch (IOException e) {
+	    	catch (UnsupportedEncodingException e) {
 				throw new ConfigurationException(e.getMessage());
 			}
 	    	

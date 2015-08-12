@@ -14,7 +14,7 @@ import bds.clemson.nfv.exception.ResourcesException;
 public class ListSupportedArchitectures extends Operation {
 
 	protected void mapArguments(String[] args) {
-		providerName = args[0];
+		// none
 	}
 	
 	protected void usage() {

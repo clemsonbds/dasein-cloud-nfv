@@ -25,8 +25,7 @@ public class ListMachineImages extends Operation {
 	private String architectureName;
 	
 	protected void mapArguments(String[] args) {
-		providerName = args[0];
-		architectureName = args[1];
+		architectureName = args[0];
 	}
 	
 	protected void usage() {

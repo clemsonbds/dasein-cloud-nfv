@@ -48,11 +48,10 @@ public class CreateVirtualMachine extends Operation {
 	private VirtualMachine launched;
 
 	protected void mapArguments(String[] args) {
-		providerName = args[0];
-    	hostName = args[1];
-    	friendlyName = args[2];
-    	architectureName = args[3];
-    	productName = args[4];
+    	hostName = args[0];
+    	friendlyName = args[1];
+    	architectureName = args[2];
+    	productName = args[3];
 	}
 	
 	protected void usage() {

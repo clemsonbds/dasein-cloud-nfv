@@ -29,8 +29,7 @@ public class StartVirtualMachine extends Operation {
 	 String newState= "start";
 	
 	protected void mapArguments(String[] args) {
-		providerName = args[0];
-		vmId = args[1];
+		vmId = args[0];
 	}
 	
 	protected void usage() {

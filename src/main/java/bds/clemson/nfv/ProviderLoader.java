@@ -25,6 +25,7 @@ import javax.annotation.Nonnull;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Properties;
 
@@ -55,8 +56,8 @@ import java.util.Properties;
 public class ProviderLoader {
     private CloudProvider configuredProvider;
 
-    public ProviderLoader(String propertiesFilename) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, CloudException, InternalException {
-        configure(propertiesFilename);
+    public ProviderLoader(Properties properties) throws ClassNotFoundException, IllegalAccessException, InstantiationException, CloudException, InternalException, UnsupportedEncodingException {
+        configure(properties);
     }
 
     public @Nonnull CloudProvider getConfiguredProvider() {
@@ -64,19 +65,8 @@ public class ProviderLoader {
     }
 
     @SuppressWarnings("unchecked")
-	private void configure(String propertiesFilename) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, CloudException, InternalException {
-    	FileReader reader;
-    	Properties properties = new Properties();
+	private void configure(Properties properties) throws ClassNotFoundException, IllegalAccessException, InstantiationException, CloudException, InternalException, UnsupportedEncodingException {
 
-    	try {
-			reader = new FileReader(propertiesFilename);
-			properties.load(reader);
-		} catch (FileNotFoundException e) {
-			throw new IOException("Cannot find properties file.");
-		} catch (IOException e) {
-			throw new IOException("Unable to read properties file.");
-		}
-    	
     	// First, read the basic configuration data from system properties
         String cname = properties.getProperty("DSN_PROVIDER_CLASS");
         String endpoint = properties.getProperty("DSN_ENDPOINT");
