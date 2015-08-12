@@ -34,7 +34,7 @@ public class RebootVirtualMachine extends Operation {
 	
 	protected void usage() {
 		System.out.println("usage: "
-				+ ListVMProducts.class.getName()
+				+ this.getClass().getName()
 				+ " <cloud name>"
 				+ " <Virtual Machine Id>"
 		);
