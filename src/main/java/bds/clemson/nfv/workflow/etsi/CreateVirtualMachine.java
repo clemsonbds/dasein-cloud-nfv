@@ -40,8 +40,13 @@ import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
 import bds.clemson.nfv.workflow.Operation;
+import bds.clemson.nfv.workflow.VMOperation;
 
-public class CreateVirtualMachine extends Operation {
+public class CreateVirtualMachine extends VMOperation {
+
+	protected CreateVirtualMachine() throws CapabilitiesException {
+		super();
+	}
 
 	private String hostName;
 	private String friendlyName;
@@ -57,7 +62,7 @@ public class CreateVirtualMachine extends Operation {
 		productName = Configuration.map(prop, "DSN_CMD_PRODUCT", Configuration.Requirement.REQUIRED);
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws CapabilitiesException {
 		CreateVirtualMachine operation = new CreateVirtualMachine();
 		operation.execute();
 
@@ -66,20 +71,9 @@ public class CreateVirtualMachine extends Operation {
 		System.out.println(operation.getLaunched().getProviderVirtualMachineId());
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
-        // see if the cloud provider has any compute services
-        ComputeServices compute = provider.getComputeServices();
-
-        if( compute == null )
-            throw new CapabilitiesException(provider.getCloudName() + " does not support any compute services.");
-
-        // see if it specifically supports virtual machines
-        VirtualMachineSupport vmSupport = compute.getVirtualMachineSupport();
-
-        if( vmSupport == null )
-            throw new CapabilitiesException(provider.getCloudName() + " does not support virtual machines.");
-
-        MachineImageSupport imgSupport = compute.getImageSupport();
+    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ExecutionException, ResourcesException, ConfigurationException {
+    	super.executeInternal();
+    	MachineImageSupport imgSupport = computeServices.getImageSupport();
 
         if( imgSupport == null )
             throw new CapabilitiesException(provider.getCloudName() + " does not support machine images.");
@@ -165,7 +159,7 @@ public class CreateVirtualMachine extends Operation {
         }
         if( vmSupport.getCapabilities().identifyRootVolumeRequirement().equals(Requirement.REQUIRED) ) {
             // let's look for the product with the smallest volume size
-            VolumeSupport volumeSupport = compute.getVolumeSupport();
+            VolumeSupport volumeSupport = computeServices.getVolumeSupport();
 
             if( volumeSupport == null ) {
             	throw new CapabilitiesException("A root volume product definition is required, but no volume support exists.");

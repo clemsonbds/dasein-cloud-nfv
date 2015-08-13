@@ -1,22 +1,14 @@
 package bds.clemson.nfv.workflow.etsi;
 
-import java.util.Properties;
-
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
-import org.dasein.cloud.compute.ComputeServices;
-import org.dasein.cloud.compute.VirtualMachine;
-import org.dasein.cloud.compute.VirtualMachineCapabilities;
-import org.dasein.cloud.compute.VirtualMachineSupport;
 import org.dasein.cloud.compute.VmState;
 
 import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
-import bds.clemson.nfv.exception.UsageException;
-import bds.clemson.nfv.workflow.Configuration;
-import bds.clemson.nfv.workflow.Operation;
+import bds.clemson.nfv.workflow.VMStateChangeOperation;
 
 /**
  * will stop the VM instance 
@@ -26,60 +18,15 @@ import bds.clemson.nfv.workflow.Operation;
  * @author uagarwa
  */
 
-public class StopVirtualMachine extends Operation {
+public class StopVirtualMachine extends VMStateChangeOperation {
 
-	private String vmId;
-	 String newState= "stop";
-	
-	protected void mapProperties(Properties prop) throws UsageException {
-		vmId = Configuration.map(prop, "DSN_CMD_VMID", Configuration.Requirement.REQUIRED);
-	}
-	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws CapabilitiesException {
 		StopVirtualMachine operation = new StopVirtualMachine();
 		operation.execute();
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
-    	ComputeServices compute = provider.getComputeServices();
-
-            if( compute == null ) 
-            System.out.println(provider.getCloudName() + " does not support any compute services.");
-        
-        
-            // see if it specifically supports virtual machines
-            VirtualMachineSupport vmSupport = compute.getVirtualMachineSupport();
-
-            if( vmSupport == null ) {
-                System.out.println(provider.getCloudName() + " does not support virtual machines.");
-            }
-            else {	
-                // find the vm and change its state
-               
-                    VirtualMachine vm = vmSupport.getVirtualMachine(vmId);
-
-                    if( vm == null ) {
-                        System.err.println("No such VM: " + vmId);
-                        return;
-                    }
-                    VirtualMachineCapabilities capabilities = vmSupport.getCapabilities();
-                    VmState currentState = vm.getCurrentState();
-                    VmState targetState = null;
-                    
-                    if( newState.equalsIgnoreCase("stop") || newState.equalsIgnoreCase("stopped")) {
-                        if( capabilities.canStop(vm.getCurrentState()) ) {
-                            targetState = VmState.STOPPED;
-                            if( currentState.equals(targetState) ) {
-                                System.err.println("VM is already " + targetState);
-                                return;
-                            }
-                            System.out.print("Stopping " + vm.getProviderVirtualMachineId() + "...");
-                            vmSupport.stop(vmId);
-                        }
-                        else {
-                            System.err.println("Cloud does not support stopping of virtual machines in the " + currentState + " state");
-                        }
-                    }
-             }
-        }
+    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ExecutionException, ResourcesException, ConfigurationException {
+    	super.executeInternal();
+    	changeState(VmState.STOPPED);
     }
+}
