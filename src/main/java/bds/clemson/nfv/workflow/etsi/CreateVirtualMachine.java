@@ -7,9 +7,6 @@ import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.Requirement;
 import org.dasein.cloud.compute.Architecture;
-import org.dasein.cloud.compute.ComputeServices;
-import org.dasein.cloud.compute.ImageClass;
-import org.dasein.cloud.compute.ImageFilterOptions;
 import org.dasein.cloud.compute.MachineImage;
 import org.dasein.cloud.compute.MachineImageState;
 import org.dasein.cloud.compute.MachineImageSupport;
@@ -17,7 +14,6 @@ import org.dasein.cloud.compute.Platform;
 import org.dasein.cloud.compute.VMLaunchOptions;
 import org.dasein.cloud.compute.VirtualMachine;
 import org.dasein.cloud.compute.VirtualMachineProduct;
-import org.dasein.cloud.compute.VirtualMachineSupport;
 import org.dasein.cloud.compute.VmState;
 import org.dasein.cloud.compute.VolumeProduct;
 import org.dasein.cloud.compute.VolumeSupport;
@@ -39,7 +35,6 @@ import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
-import bds.clemson.nfv.workflow.Operation;
 import bds.clemson.nfv.workflow.VMOperation;
 
 public class CreateVirtualMachine extends VMOperation {
@@ -52,6 +47,7 @@ public class CreateVirtualMachine extends VMOperation {
 	private String friendlyName;
 	private String architectureName;
 	private String productName;
+	private String machineImageId;
 
 	private VirtualMachine launched;
 
@@ -60,6 +56,7 @@ public class CreateVirtualMachine extends VMOperation {
 		friendlyName = Configuration.map(prop, "DSN_CMD_FRIENDLYNAME", Configuration.Requirement.REQUIRED);
 		architectureName = Configuration.map(prop, "DSN_CMD_ARCHITECTURE", Configuration.Requirement.REQUIRED);
 		productName = Configuration.map(prop, "DSN_CMD_PRODUCT", Configuration.Requirement.REQUIRED);
+		machineImageId = Configuration.map(prop, "DSN_CMD_IMAGE", Configuration.Requirement.REQUIRED);
 	}
 	
 	public static void main(String[] args) throws CapabilitiesException {
@@ -73,6 +70,7 @@ public class CreateVirtualMachine extends VMOperation {
 
     protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ExecutionException, ResourcesException, ConfigurationException {
     	super.executeInternal();
+
     	MachineImageSupport imgSupport = computeServices.getImageSupport();
 
         if( imgSupport == null )
@@ -103,19 +101,18 @@ public class CreateVirtualMachine extends VMOperation {
         if (product == null)
             throw new CapabilitiesException(provider.getCloudName() + " does not have a '" + productName + "' product for the " + targetArchitecture + " architecture.");
 
-        Platform platform = Platform.UNKNOWN;
-        String machineImageId = null;
+        MachineImage image = imgSupport.getImage(machineImageId);
 
-        for( MachineImage image : imgSupport.listImages(ImageFilterOptions.getInstance(ImageClass.MACHINE)) ) {
-            if( image.getCurrentState().equals(MachineImageState.ACTIVE) && image.getArchitecture().equals(targetArchitecture)) {
-                machineImageId = image.getProviderMachineImageId();
-                platform = image.getPlatform();
-                break;
-            }
-        }
-        if( machineImageId == null ) {
-            throw new ResourcesException("No active machine images exist for " + targetArchitecture);
-        }
+        if (image == null)
+        	throw new ResourcesException("No such image '" + machineImageId + "'.");
+
+        if (!image.getCurrentState().equals(MachineImageState.ACTIVE))
+        	throw new ResourcesException("Image '" + machineImageId + "' is not active.");
+        
+        if (!image.getArchitecture().equals(targetArchitecture))
+        	throw new ResourcesException("Image '" + machineImageId + "' is meant for the " + image.getArchitecture() + " architecture.");
+        
+        Platform platform = image.getPlatform();
 
         VMLaunchOptions options = VMLaunchOptions.getInstance(product.getProviderProductId(), machineImageId, hostName, friendlyName, friendlyName);
 
