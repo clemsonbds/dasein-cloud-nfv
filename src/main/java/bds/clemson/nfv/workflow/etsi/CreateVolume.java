@@ -36,7 +36,6 @@ public class CreateVolume extends VolumeOperation {
     	super.executeInternal();
     	
         // launch a vm
-    	VolumeProduct product = null;
     	/**
                      * Provides options for creating a block volume of a specific size based on a specific product. This method makes no sense
                      * when {@link VolumeSupport#getVolumeProductRequirement()}  is {@link Requirement#NONE}.
@@ -49,13 +48,12 @@ public class CreateVolume extends VolumeOperation {
  **/
         
         // get product from productName first? this will be null
-        String volumeProductId = product.getProviderProductId();
 		Storage<Gigabyte> size = new Storage<Gigabyte>(2, Storage.GIGABYTE); // how to specify size, what would be the format
         String volname="test";
         String voldescription="might work";
         int voliops=300;
 
-        VolumeCreateOptions options = VolumeCreateOptions.getInstance(volumeProductId, size, volname, voldescription, voliops);
+        VolumeCreateOptions options = VolumeCreateOptions.getInstance(productName, size, volname, voldescription, voliops);
 
         
                           
