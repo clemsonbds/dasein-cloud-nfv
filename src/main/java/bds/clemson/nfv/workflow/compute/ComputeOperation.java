@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow;
+package bds.clemson.nfv.workflow.compute;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
@@ -7,6 +7,7 @@ import org.dasein.cloud.compute.ComputeServices;
 
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ResourcesException;
+import bds.clemson.nfv.workflow.Operation;
 
 public abstract class ComputeOperation extends Operation {
 	protected ComputeServices computeServices;

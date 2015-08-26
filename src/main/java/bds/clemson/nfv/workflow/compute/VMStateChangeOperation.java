@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow;
+package bds.clemson.nfv.workflow.compute;
 
 import java.util.Properties;
 
@@ -8,6 +8,7 @@ import org.dasein.cloud.compute.VirtualMachine;
 import org.dasein.cloud.compute.VmState;
 
 import bds.clemson.nfv.exception.UsageException;
+import bds.clemson.nfv.workflow.Configuration;
 
 public abstract class VMStateChangeOperation extends VMOperation {
 	private String vmId;

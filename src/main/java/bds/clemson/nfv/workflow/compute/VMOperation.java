@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow;
+package bds.clemson.nfv.workflow.compute;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
@@ -8,6 +8,7 @@ import org.dasein.cloud.compute.VirtualMachineSupport;
 
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ResourcesException;
+import bds.clemson.nfv.workflow.compute.ComputeOperation;
 
 public abstract class VMOperation extends ComputeOperation {
 	protected VirtualMachineSupport vmSupport;

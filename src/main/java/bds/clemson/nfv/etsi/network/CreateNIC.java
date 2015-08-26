@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow.etsi.network;
+package bds.clemson.nfv.etsi.network;
 
 import java.util.Properties;
 
@@ -13,7 +13,7 @@ import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
-import bds.clemson.nfv.workflow.NetworkOperation;
+import bds.clemson.nfv.workflow.network.NetworkOperation;
 
 
 public class CreateNIC extends NetworkOperation {

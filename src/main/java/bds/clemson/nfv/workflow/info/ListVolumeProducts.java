@@ -11,7 +11,7 @@ import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 
-import bds.clemson.nfv.workflow.VolumeOperation;
+import bds.clemson.nfv.workflow.storage.VolumeOperation;
 
 public class ListVolumeProducts extends VolumeOperation {
 

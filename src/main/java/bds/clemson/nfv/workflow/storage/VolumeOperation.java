@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow;
+package bds.clemson.nfv.workflow.storage;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
@@ -7,6 +7,8 @@ import org.dasein.cloud.compute.VolumeSupport;
 
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ResourcesException;
+import bds.clemson.nfv.workflow.Operation;
+import bds.clemson.nfv.workflow.compute.ComputeOperation;
 
 public abstract class VolumeOperation extends ComputeOperation {
 	protected VolumeSupport volumeSupport;

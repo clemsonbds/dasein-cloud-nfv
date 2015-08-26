@@ -1,33 +1,35 @@
-package bds.clemson.nfv.workflow.etsi.vm;
+package bds.clemson.nfv.etsi.network;
 
 import java.util.Properties;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.OperationNotSupportedException;
-import org.dasein.cloud.compute.VirtualMachine;
+import org.dasein.cloud.network.NetworkInterface;
 
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
-import bds.clemson.nfv.workflow.VMOperation;
+import bds.clemson.nfv.workflow.network.NetworkOperation;
 
-public class List extends VMOperation {
 
+public class ListVirtualNetworkDevice extends NetworkOperation {
+
+		
 	protected void mapProperties(Properties prop) throws UsageException {
-		// none
+	//none
 	}
 	
 	public static void main(String[] args) {
-		List operation = new List();
+		ListVirtualNetworkDevice operation = new ListVirtualNetworkDevice();
 		operation.execute();
 	}
 
     protected void executeInternal() throws InternalException, CloudException, ConfigurationException, ResourcesException, OperationNotSupportedException {
     	super.executeInternal();
-    	
-        for( VirtualMachine vm : vmSupport.listVirtualMachines() ) {
-            System.out.println(vm.getName() + " [" + vm.getProviderVirtualMachineId() + "] (" + vm.getCurrentState() + ")");
+
+        for (NetworkInterface NIC: vlanSupport.listNetworkInterfaces()) {
+        	System.out.println(NIC.getProviderVlanId() + ", " + NIC.getName() + ", " + NIC.getDescription());
         }
     }
 }

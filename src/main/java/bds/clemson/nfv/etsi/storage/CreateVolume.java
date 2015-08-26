@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow.etsi.storage;
+package bds.clemson.nfv.etsi.storage;
 
 import java.util.Properties;
 
@@ -15,7 +15,7 @@ import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
-import bds.clemson.nfv.workflow.VolumeOperation;
+import bds.clemson.nfv.workflow.storage.VolumeOperation;
 
 public class CreateVolume extends VolumeOperation {
 

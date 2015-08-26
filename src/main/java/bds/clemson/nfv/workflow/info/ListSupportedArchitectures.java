@@ -10,7 +10,7 @@ import org.dasein.cloud.compute.Architecture;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
-import bds.clemson.nfv.workflow.VMOperation;
+import bds.clemson.nfv.workflow.compute.VMOperation;
 
 public class ListSupportedArchitectures extends VMOperation {
 
