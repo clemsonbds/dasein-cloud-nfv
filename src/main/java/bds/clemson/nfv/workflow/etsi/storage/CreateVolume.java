@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow.etsi;
+package bds.clemson.nfv.workflow.etsi.storage;
 
 import java.util.Properties;
 

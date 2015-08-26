@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow.etsi;
+package bds.clemson.nfv.workflow.etsi.vm;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
@@ -10,22 +10,22 @@ import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.workflow.VMStateChangeOperation;
 
 /**
- * will start the VM instance 
+ * will reboot the VM instance 
  * example provider name "AWS"
  * example input arguments are virtual machine id "i-790cb7bc"
  * 
  * @author uagarwa
  */
 
-public class StartVirtualMachine extends VMStateChangeOperation {
+public class Reboot extends VMStateChangeOperation {
 
 	public static void main(String[] args) throws UnsupportedOperationException {
-		StartVirtualMachine operation = new StartVirtualMachine();
+		Reboot operation = new Reboot();
 		operation.execute();
 	}
 
     protected void executeInternal() throws InternalException, CloudException, ResourcesException, ConfigurationException, OperationNotSupportedException {
     	super.executeInternal();
-    	changeState(VmState.RUNNING);
+    	changeState(VmState.REBOOTING);
     }
 }

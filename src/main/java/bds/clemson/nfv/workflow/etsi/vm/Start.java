@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow.etsi;
+package bds.clemson.nfv.workflow.etsi.vm;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
@@ -10,22 +10,22 @@ import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.workflow.VMStateChangeOperation;
 
 /**
- * will terminate the VM instance without saving any data 
+ * will start the VM instance 
  * example provider name "AWS"
  * example input arguments are virtual machine id "i-790cb7bc"
  * 
  * @author uagarwa
  */
 
-public class DestroyVirtualMachine extends VMStateChangeOperation {
+public class Start extends VMStateChangeOperation {
 
 	public static void main(String[] args) throws UnsupportedOperationException {
-		DestroyVirtualMachine operation = new DestroyVirtualMachine();
+		Start operation = new Start();
 		operation.execute();
 	}
 
     protected void executeInternal() throws InternalException, CloudException, ResourcesException, ConfigurationException, OperationNotSupportedException {
     	super.executeInternal();
-    	changeState(VmState.TERMINATED);
+    	changeState(VmState.RUNNING);
     }
 }

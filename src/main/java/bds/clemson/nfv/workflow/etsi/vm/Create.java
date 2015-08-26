@@ -1,4 +1,4 @@
-package bds.clemson.nfv.workflow.etsi;
+package bds.clemson.nfv.workflow.etsi.vm;
 
 import java.util.Properties;
 
@@ -35,9 +35,9 @@ import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
 import bds.clemson.nfv.workflow.VMOperation;
 
-public class CreateVirtualMachine extends VMOperation {
+public class Create extends VMOperation {
 
-	protected CreateVirtualMachine() throws UnsupportedOperationException {
+	protected Create() throws UnsupportedOperationException {
 		super();
 	}
 
@@ -73,7 +73,7 @@ public class CreateVirtualMachine extends VMOperation {
 	}
 	
 	public static void main(String[] args) throws UnsupportedOperationException {
-		CreateVirtualMachine operation = new CreateVirtualMachine();
+		Create operation = new Create();
 		operation.execute();
 
 //    	System.out.println("Launched: " + command.getLaunched().getName() + "[" + command.getLaunched().getProviderVirtualMachineId() + "] (" + command.getLaunched().getCurrentState() + ")");
