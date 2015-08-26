@@ -21,9 +21,9 @@ public class Update extends VMOperation {
 	@Override
 	protected void mapProperties(Properties prop) throws UsageException {
 		// TODO Auto-generated method stub
-		vmId = Configuration.map(prop, "DSN_CMD_VM", Configuration.Requirement.REQUIRED);
-		operation = Configuration.map(prop, "DSN_CMD_OPERATION", Configuration.Requirement.REQUIRED);
-		device = Configuration.map(prop, "DSN_CMD_DEVICE", Configuration.Requirement.REQUIRED);
+		vmId = Configuration.map(prop, Configuration.Field.VM_ID, Configuration.Requirement.REQUIRED);
+		operation = Configuration.map(prop, Configuration.Field.OPERATION, Configuration.Requirement.REQUIRED);
+		device = Configuration.map(prop, Configuration.Field.DEVICE_ID, Configuration.Requirement.REQUIRED);
 	}
 
 	public static void main(String[] args) {

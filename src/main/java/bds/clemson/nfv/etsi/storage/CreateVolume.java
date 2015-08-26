@@ -26,11 +26,11 @@ public class CreateVolume extends VolumeOperation {
     private Integer iops;
 	
 	protected void mapProperties(Properties prop) throws UsageException {
-		productId = Configuration.map(prop, "DSN_CMD_PRODUCT", Configuration.Requirement.REQUIRED);
-		VolumeName = Configuration.map(prop, "DSN_CMD_VOLUMENAME", Configuration.Requirement.REQUIRED);
-		VolumeDes = Configuration.map(prop, "DSN_CMD_VOLUMEDES", Configuration.Requirement.REQUIRED);
-		capacity = Integer.parseInt(Configuration.map(prop, "DSN_CMD_CAPACITY", Configuration.Requirement.REQUIRED));
-		iops = Integer.parseInt(Configuration.map(prop, "DSN_CMD_IOPS", Configuration.Requirement.REQUIRED));
+		productId = Configuration.map(prop, Configuration.Field.VOLUME_PRODUCT_NAME, Configuration.Requirement.REQUIRED);
+		VolumeName = Configuration.map(prop, Configuration.Field.NAME, Configuration.Requirement.REQUIRED);
+		VolumeDes = Configuration.map(prop, Configuration.Field.DESCRIPTION, Configuration.Requirement.REQUIRED);
+		capacity = Integer.parseInt(Configuration.map(prop, Configuration.Field.VOLUME_CAPACITY, Configuration.Requirement.REQUIRED));
+		iops = Integer.parseInt(Configuration.map(prop, Configuration.Field.VOLUME_IOPS, Configuration.Requirement.REQUIRED));
 		
 	}
 	

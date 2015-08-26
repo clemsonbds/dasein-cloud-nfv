@@ -10,7 +10,7 @@ import org.dasein.cloud.compute.VmState;
 import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
 
-public abstract class VMStateChangeOperation extends VMOperation {
+public abstract class VMUpdateOperation extends VMOperation {
 	private String vmId;
 
 	protected void mapProperties(Properties prop) throws UsageException {

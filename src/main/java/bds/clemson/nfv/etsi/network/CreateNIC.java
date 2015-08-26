@@ -24,9 +24,9 @@ public class CreateNIC extends NetworkOperation {
 	
 	
 	protected void mapProperties(Properties prop) throws UsageException {
-		subnetID = Configuration.map(prop, "DSN_CMD_SUBNETID", Configuration.Requirement.REQUIRED);
-		name = Configuration.map(prop, "DSN_CMD_NAME", Configuration.Requirement.REQUIRED);
-		description = Configuration.map(prop, "DSN_CMD_DES", Configuration.Requirement.REQUIRED);
+		subnetID = Configuration.map(prop, Configuration.Field.SUBNET_ID, Configuration.Requirement.REQUIRED);
+		name = Configuration.map(prop, Configuration.Field.NAME, Configuration.Requirement.REQUIRED);
+		description = Configuration.map(prop, Configuration.Field.DESCRIPTION, Configuration.Requirement.REQUIRED);
 				
 	}
 	
