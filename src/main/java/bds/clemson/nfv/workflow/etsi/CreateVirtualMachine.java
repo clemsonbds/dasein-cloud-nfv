@@ -45,18 +45,33 @@ public class CreateVirtualMachine extends VMOperation {
 
 	private String hostName;
 	private String friendlyName;
+	private String description;
 	private String architectureName;
 	private String productName;
 	private String machineImageId;
+	private String shellUsername;
+	private String shellKeyId;
+	private String shellPassword;
+	private String rootVolumeProductId;
+	private String vlanId;
+	private String subnetId;
+	
 
 	private VirtualMachine launched;
 
 	protected void mapProperties(Properties prop) throws UsageException {
-		hostName = Configuration.map(prop, "DSN_CMD_HOSTNAME", Configuration.Requirement.REQUIRED);
+		hostName = Configuration.map(prop, "DSN_CMD_HOSTNAME", Configuration.Requirement.OPTIONAL);
 		friendlyName = Configuration.map(prop, "DSN_CMD_FRIENDLYNAME", Configuration.Requirement.REQUIRED);
+		description = Configuration.map(prop, "DSN_CMD_DESCRIPTION", Configuration.Requirement.OPTIONAL);
 		architectureName = Configuration.map(prop, "DSN_CMD_ARCHITECTURE", Configuration.Requirement.REQUIRED);
 		productName = Configuration.map(prop, "DSN_CMD_PRODUCT", Configuration.Requirement.REQUIRED);
 		machineImageId = Configuration.map(prop, "DSN_CMD_IMAGE", Configuration.Requirement.REQUIRED);
+		shellUsername = Configuration.map(prop, "DSN_CMD_SHELL_USERNAME", Configuration.Requirement.OPTIONAL);
+		shellKeyId = Configuration.map(prop, "DSN_CMD_SHELL_KEY", Configuration.Requirement.OPTIONAL);
+		shellPassword = Configuration.map(prop, "DSN_CMD_SHELL_PASSWORD", Configuration.Requirement.OPTIONAL);
+		rootVolumeProductId = Configuration.map(prop, "DSN_CMD_ROOT_VOLUME_PRODUCT", Configuration.Requirement.OPTIONAL);
+		vlanId = Configuration.map(prop, "DSN_CMD_VLAN", Configuration.Requirement.OPTIONAL);
+		subnetId = Configuration.map(prop, "DSN_CMD_SUBNET", Configuration.Requirement.OPTIONAL);
 	}
 	
 	public static void main(String[] args) throws CapabilitiesException {
@@ -71,37 +86,34 @@ public class CreateVirtualMachine extends VMOperation {
     protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ExecutionException, ResourcesException, ConfigurationException {
     	super.executeInternal();
 
-    	MachineImageSupport imgSupport = computeServices.getImageSupport();
+    	MachineImageSupport imageSupport = computeServices.getImageSupport();
 
-        if( imgSupport == null )
+        if( imageSupport == null )
             throw new CapabilitiesException(provider.getCloudName() + " does not support machine images.");
 
         // find a target architecture and VM product
-        Architecture targetArchitecture = null;
-
-        for( Architecture architecture : vmSupport.getCapabilities().listSupportedArchitectures() ) {
-        	if (architectureName.equals(architecture.toString())) {
-                targetArchitecture = architecture;
-                break;
-        	}
-        }
+        Architecture targetArchitecture = this.getSupportedArchitecture(architectureName);
 
         if (targetArchitecture == null)
-        	throw new CapabilitiesException(provider.getCloudName() + " does not support the " + architectureName + " architecture.");
+        	throw new CapabilitiesException(provider.getCloudName() + " does not support the '" + architectureName + "' architecture.");
 
-        VirtualMachineProduct product = null;
-
-        for (VirtualMachineProduct p: vmSupport.listProducts(targetArchitecture)) {
-        	if (productName.equals(p.getProviderProductId())) {
-        		product = p;
-        		break;
-        	}
-        }
+        VirtualMachineProduct product = vmSupport.getProduct(productName);
 
         if (product == null)
-            throw new CapabilitiesException(provider.getCloudName() + " does not have a '" + productName + "' product for the " + targetArchitecture + " architecture.");
+        	throw new ResourcesException(provider.getCloudName() + " does not have a '" + productName + "' VM product.");
+        
+        boolean supported = false;
+        
+        for (Architecture architecture : product.getArchitectures())
+        	if (architecture.equals(targetArchitecture)) {
+        		supported = true;
+        		break;
+        	}
 
-        MachineImage image = imgSupport.getImage(machineImageId);
+        if (supported == false)
+        	throw new ResourcesException("The '" + productName + "' product is not available for the " + targetArchitecture + " architecture.");
+        
+        MachineImage image = imageSupport.getImage(machineImageId);
 
         if (image == null)
         	throw new ResourcesException("No such image '" + machineImageId + "'.");
@@ -114,112 +126,143 @@ public class CreateVirtualMachine extends VMOperation {
         
         Platform platform = image.getPlatform();
 
-        VMLaunchOptions options = VMLaunchOptions.getInstance(product.getProviderProductId(), machineImageId, hostName, friendlyName, friendlyName);
+        VMLaunchOptions options = VMLaunchOptions.getInstance(
+        	product.getProviderProductId(),
+        	machineImageId,
+        	hostName != null ? hostName : friendlyName,
+        	friendlyName,
+        	description != null ? description : friendlyName
+        );
 
-        if( vmSupport.getCapabilities().identifyShellKeyRequirement(platform).equals(Requirement.REQUIRED) ) {
-            // you must specify an SSH key when launching the VM
-            // we'll look one up
+        Requirement req = vmSupport.getCapabilities().identifyShellKeyRequirement(platform);
+        
+    	if (req.equals(Requirement.REQUIRED)
+    	 || (req.equals(Requirement.OPTIONAL) && shellKeyId != null)) {
+
+            if (shellKeyId == null)
+            	throw new ConfigurationException("No shell key ID provided, but shell keys are required.");
+
             IdentityServices identity = provider.getIdentityServices();
 
-            if( identity == null ) {
-                throw new ConfigurationException("No identity services exist, but shell keys are required.");
-            }
+            if( identity == null )
+                throw new CapabilitiesException("No identity services exist, but shell keys are required.");
+
             ShellKeySupport keySupport = identity.getShellKeySupport();
 
-            if( keySupport == null ) {
+            if( keySupport == null )
             	throw new CapabilitiesException("No shell key support exists, but shell keys are required.");
-            }
-            Iterator<SSHKeypair> keys = keySupport.list().iterator();
-            String keyId = null;
+            
+            SSHKeypair keyPair = keySupport.getKeypair(shellKeyId);
+            
+            if (keyPair == null)
+            	throw new ConfigurationException("The shell key ID '" + shellKeyId + "' is invalid.");
 
-            if( keys.hasNext() ) {
-                keyId = keys.next().getProviderKeypairId();
-            }
-            if( keyId == null ) {
-                // no keypair yet exists, so we'll create one
-                if( keySupport.getCapabilities().identifyKeyImportRequirement().equals(Requirement.REQUIRED) ) {
-                    // hmm, this cloud doesn't create them for you; it requires you to import them
-                    // importing keys is beyond the scope of this example
-                	throw new CapabilitiesException("Importing key pairs NYI, and thus won't work against " + provider.getCloudName() + ".");
-                }
+            options.withBootstrapKey(keyPair.getProviderKeypairId());
+        }
 
-                // create the sample keypair
-                keyId = keySupport.createKeypair("dsnex" + System.currentTimeMillis()).getProviderKeypairId();
-            }
-            if( keyId != null ) {
-                options.withBootstrapKey(keyId);
-            }
+    	req = vmSupport.getCapabilities().identifyPasswordRequirement(platform);
+    	
+        if (req.equals(Requirement.REQUIRED)
+         || (req.equals(Requirement.OPTIONAL) && shellUsername != null && shellPassword != null)) {
+
+        	if (shellUsername == null)
+        		throw new ConfigurationException("No shell username provided, but shell username is required.");
+        	
+        	// you must specify a password when launching a VM
+        	if (shellPassword == null)
+        		throw new ConfigurationException("No shell password provided, but shell password is required.");
+
+        	options.withBootstrapUser(shellUsername, shellPassword);
         }
-        if( vmSupport.getCapabilities().identifyPasswordRequirement(platform).equals(Requirement.REQUIRED) ) {
-            // you must specify a password when launching a VM
-            options.withBootstrapUser("dsnexample", "pw" + System.currentTimeMillis());
-        }
-        if( vmSupport.getCapabilities().identifyRootVolumeRequirement().equals(Requirement.REQUIRED) ) {
-            // let's look for the product with the smallest volume size
+
+        req = vmSupport.getCapabilities().identifyRootVolumeRequirement();
+        
+        if (req.equals(Requirement.REQUIRED)
+         || (req.equals(Requirement.OPTIONAL) && rootVolumeProductId != null)) {
+
             VolumeSupport volumeSupport = computeServices.getVolumeSupport();
 
-            if( volumeSupport == null ) {
-            	throw new CapabilitiesException("A root volume product definition is required, but no volume support exists.");
-            }
+            if( volumeSupport == null )
+            	throw new CapabilitiesException("A root volume product is required, but no volume support exists.");
 
-            boolean findSmallest = volumeSupport.getCapabilities().isVolumeSizeDeterminedByProduct();
-            VolumeProduct vp = null;
-            long vpSize = 0L;
+            VolumeProduct rootVolumeProduct = null;
+            
+        	if (rootVolumeProductId == null) { // if none is specified, try to find the minimum requirement
+                long vpSize = 0L;
 
-            for( VolumeProduct prd : volumeSupport.listVolumeProducts() ) {
-                Storage<Gigabyte> size = prd.getMinVolumeSize();
+                for( VolumeProduct prd : volumeSupport.listVolumeProducts() ) {
+                    Storage<Gigabyte> size = prd.getMinVolumeSize();
 
-                if( vp == null || (size != null && size.getQuantity().longValue() > 0L && prd.getMinVolumeSize().getQuantity().longValue() < vpSize) ) {
-                    vp = prd;
-                    size = vp.getMinVolumeSize();
-                    if( size != null ) {
-                        vpSize = size.getQuantity().longValue();
-                    }
-                    if( !findSmallest ) { // size is not included in the product definition
-                        break;
+                    if (rootVolumeProduct == null || (size != null && size.getQuantity().longValue() > 0L && prd.getMinVolumeSize().getQuantity().longValue() < vpSize) ) {
+                    	rootVolumeProduct = prd;
+                        size = rootVolumeProduct.getMinVolumeSize();
+
+                        if (size != null)
+                            vpSize = size.getQuantity().longValue();
+
+                        if (!volumeSupport.getCapabilities().isVolumeSizeDeterminedByProduct()) // size is not included in the product definition
+                            break;
                     }
                 }
-            }
-            if( vp == null ) {
+        	}
+        	else {
+        		for (VolumeProduct prd : volumeSupport.listVolumeProducts()) {
+        			if (prd.getProviderProductId().equals(rootVolumeProductId)) {
+        				rootVolumeProduct = prd;
+        				break;
+        			}
+        		}
+        	}
+
+            if (rootVolumeProduct == null)
             	throw new ResourcesException("Unable to identify any volume products.");
-            }
-            options.withRootVolumeProduct(vp.getProviderProductId());
+            
+            options.withRootVolumeProduct(rootVolumeProduct.getProviderProductId());
         }
-        if( vmSupport.getCapabilities().identifyVlanRequirement().equals(Requirement.REQUIRED) ) {
+
+        req = vmSupport.getCapabilities().identifyVlanRequirement();
+        
+        if (req.equals(Requirement.REQUIRED)
+         || (req.equals(Requirement.OPTIONAL) && vlanId != null)) {
+
+        	if (vlanId == null)
+        		throw new ConfigurationException("A VLAN is required for launching a VM, but no VLAN ID was provided.");
+        	
             NetworkServices network = provider.getNetworkServices();
 
-            if( network == null ) {
+            if (network == null)
             	throw new CapabilitiesException("No network services exist even though a VLAN is required for launching a VM.");
-            }
 
             VLANSupport vlanSupport = network.getVlanSupport();
 
-            if( vlanSupport == null ) {
+            if (vlanSupport == null)
             	throw new CapabilitiesException("No VLANs are supported in " + provider.getCloudName() + " event though a VLAN is required to launch a VM.");
-            }
-            VLAN vlan = null;
 
-            for( VLAN v : vlanSupport.listVlans() ) {
-                if( v.getCurrentState().equals(VLANState.AVAILABLE) ) {
-                    vlan = v;
-                    break;
-                }
-            }
-            if( vlan == null ) {
-            	throw new ResourcesException("VLAN support is required, but was not able to identify a VLAN in an available state");
-            }
-            if( vlanSupport.getCapabilities().getSubnetSupport().equals(Requirement.REQUIRED) ) {
-                Subnet subnet = null;
+            VLAN vlan = vlanSupport.getVlan(vlanId);
 
-                for( Subnet s : vlanSupport.listSubnets(vlan.getProviderVlanId()) ) {
-                    if( s.getCurrentState().equals(SubnetState.AVAILABLE) ) {
-                        subnet = s;
-                    }
-                }
-                if( subnet != null ) { // let's just hope it works if no active subnet exists, probably won't
-                    options.inVlan(null, vlan.getProviderDataCenterId(), subnet.getProviderSubnetId());
-                }
-                options.inVlan(null, vlan.getProviderDataCenterId(), vlan.getProviderVlanId());
+            if (vlan == null)
+            	throw new ResourcesException("VLAN '" + vlanId + "' does not exist.");
+
+            if (!vlan.getCurrentState().equals(VLANState.AVAILABLE))
+            	throw new ResourcesException("VLAN " + vlanId + " is not available.");
+
+            req = vlanSupport.getCapabilities().getSubnetSupport();
+            
+            if (req.equals(Requirement.REQUIRED)
+             || (req.equals(Requirement.OPTIONAL) && subnetId != null)) {
+            	
+            	if (subnetId == null)
+            		throw new ConfigurationException("A subnet is required for launching a VM, but no subnet ID was provided.");
+
+            	Subnet subnet = vlanSupport.getSubnet(subnetId);
+
+                if (subnet == null)
+                	throw new ResourcesException("Subnet '" + subnetId + "' does not exist.");
+                	
+                if (!subnet.getCurrentState().equals(SubnetState.AVAILABLE))
+                	throw new ResourcesException("Subnet " + subnetId + " is not available.");
+
+                options.inSubnet(null, vlan.getProviderDataCenterId(), vlan.getProviderVlanId(), subnet.getProviderSubnetId());
             }
             else {
                 options.inVlan(null, vlan.getProviderDataCenterId(), vlan.getProviderVlanId());
@@ -227,17 +270,17 @@ public class CreateVirtualMachine extends VMOperation {
         }
 
         VirtualMachine launching = null;
-//        launching = vmSupport.launch(options);
+        launching = vmSupport.launch(options);
 
         while( launching != null && launching.getCurrentState().equals(VmState.PENDING) ) {
-            try { Thread.sleep(5000L); }
+            try { Thread.sleep(1000L); }
             catch( InterruptedException ignore ) { }
 
             launching = vmSupport.getVirtualMachine(launching.getProviderVirtualMachineId());
         }
 
         if( launching == null ) {
-            throw new ExecutionException("VM self-terminated before entering a usable state");
+            throw new ExecutionException("VM self-terminated before entering a usable state.");
         }
 
         this.launched = launching;
