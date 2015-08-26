@@ -7,7 +7,6 @@ import org.dasein.cloud.InternalException;
 
 import org.dasein.cloud.network.NetworkInterface;
 
-import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
@@ -27,7 +26,7 @@ public class ListVirtualNetworkDevice extends NetworkOperation {
 		operation.execute();
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
+    protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ConfigurationException, ResourcesException, ExecutionException {
     	super.executeInternal();
 
         for (NetworkInterface NIC: vlanSupport.listNetworkInterfaces()) {

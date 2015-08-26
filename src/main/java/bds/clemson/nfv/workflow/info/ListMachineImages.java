@@ -11,7 +11,6 @@ import org.dasein.cloud.compute.MachineImage;
 import org.dasein.cloud.compute.MachineImageState;
 import org.dasein.cloud.compute.MachineImageSupport;
 
-import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
@@ -32,13 +31,13 @@ public class ListMachineImages extends VMOperation {
 		operation.execute();
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
+    protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ConfigurationException, ResourcesException, ExecutionException {
     	super.executeInternal();
 
         MachineImageSupport imgSupport = computeServices.getImageSupport();
 
         if( imgSupport == null )
-            throw new CapabilitiesException(provider.getCloudName() + " does not support machine images.");
+            throw new UnsupportedOperationException(provider.getCloudName() + " does not support machine images.");
 
         // find a target architecture and VM product
         Architecture targetArchitecture = null;
@@ -51,7 +50,7 @@ public class ListMachineImages extends VMOperation {
         }
 
         if (targetArchitecture == null)
-        	throw new CapabilitiesException(provider.getCloudName() + " does not support the " + architectureName + " architecture.");
+        	throw new UnsupportedOperationException(provider.getCloudName() + " does not support the " + architectureName + " architecture.");
 
         for( MachineImage image : imgSupport.listImages(ImageFilterOptions.getInstance(ImageClass.MACHINE)) ) {
             if( image.getCurrentState().equals(MachineImageState.ACTIVE) && image.getArchitecture().equals(targetArchitecture)) {

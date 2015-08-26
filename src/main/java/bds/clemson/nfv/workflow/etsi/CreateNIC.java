@@ -9,7 +9,6 @@ import org.dasein.cloud.network.NICCreateOptions;
 import org.dasein.cloud.network.NICState;
 import org.dasein.cloud.network.NetworkInterface;
 
-import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
@@ -38,7 +37,7 @@ public class CreateNIC extends NetworkOperation {
 	}
 
     
-	protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
+	protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ConfigurationException, ResourcesException, ExecutionException {
     	super.executeInternal();
          
        	NICCreateOptions options = NICCreateOptions.getInstanceForSubnet(subnetID, name, description);

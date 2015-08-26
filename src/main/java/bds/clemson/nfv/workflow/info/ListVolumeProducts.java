@@ -6,7 +6,6 @@ import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.compute.VolumeProduct;
 
-import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
@@ -26,7 +25,7 @@ public class ListVolumeProducts extends VolumeOperation {
 		operation.execute();
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
+    protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ConfigurationException, ResourcesException, ExecutionException {
     	super.executeInternal();
 
         for (VolumeProduct product: volumeSupport.listVolumeProducts()) {

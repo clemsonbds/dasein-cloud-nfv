@@ -11,7 +11,6 @@ import org.dasein.cloud.CloudProvider;
 import org.dasein.cloud.InternalException;
 
 import bds.clemson.nfv.ProviderLoader;
-import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
@@ -21,7 +20,7 @@ public abstract class Operation {
 	protected CloudProvider provider;
 
     protected abstract void mapProperties(Properties prop) throws UsageException;
-    protected abstract void executeInternal() throws UsageException, InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException;
+    protected abstract void executeInternal() throws UsageException, InternalException, CloudException, UnsupportedOperationException, ConfigurationException, ResourcesException, ExecutionException;
 
     protected void execute() {
 		try {
@@ -71,7 +70,7 @@ public abstract class Operation {
 	        System.err.println("An error occurred with the provider configuration: " + e.getMessage());
 			e.printStackTrace();
 		}
-	    catch (CapabilitiesException e) {
+	    catch (UnsupportedOperationException e) {
 	        System.err.println("An error occurred with the expected capabilities: " + e.getMessage());
 	        e.printStackTrace();
 		}

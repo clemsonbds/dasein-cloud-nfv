@@ -29,7 +29,6 @@ import org.dasein.cloud.network.VLANSupport;
 import org.dasein.util.uom.storage.Gigabyte;
 import org.dasein.util.uom.storage.Storage;
 
-import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
@@ -39,7 +38,7 @@ import bds.clemson.nfv.workflow.VMOperation;
 
 public class CreateVirtualMachine extends VMOperation {
 
-	protected CreateVirtualMachine() throws CapabilitiesException {
+	protected CreateVirtualMachine() throws UnsupportedOperationException {
 		super();
 	}
 
@@ -74,7 +73,7 @@ public class CreateVirtualMachine extends VMOperation {
 		subnetId = Configuration.map(prop, "DSN_CMD_SUBNET", Configuration.Requirement.OPTIONAL);
 	}
 	
-	public static void main(String[] args) throws CapabilitiesException {
+	public static void main(String[] args) throws UnsupportedOperationException {
 		CreateVirtualMachine operation = new CreateVirtualMachine();
 		operation.execute();
 
@@ -83,19 +82,19 @@ public class CreateVirtualMachine extends VMOperation {
 		System.out.println(operation.getLaunched().getProviderVirtualMachineId());
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ExecutionException, ResourcesException, ConfigurationException {
+    protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ExecutionException, ResourcesException, ConfigurationException {
     	super.executeInternal();
 
     	MachineImageSupport imageSupport = computeServices.getImageSupport();
 
         if( imageSupport == null )
-            throw new CapabilitiesException(provider.getCloudName() + " does not support machine images.");
+            throw new UnsupportedOperationException(provider.getCloudName() + " does not support machine images.");
 
         // find a target architecture and VM product
         Architecture targetArchitecture = this.getSupportedArchitecture(architectureName);
 
         if (targetArchitecture == null)
-        	throw new CapabilitiesException(provider.getCloudName() + " does not support the '" + architectureName + "' architecture.");
+        	throw new UnsupportedOperationException(provider.getCloudName() + " does not support the '" + architectureName + "' architecture.");
 
         VirtualMachineProduct product = vmSupport.getProduct(productName);
 
@@ -145,12 +144,12 @@ public class CreateVirtualMachine extends VMOperation {
             IdentityServices identity = provider.getIdentityServices();
 
             if( identity == null )
-                throw new CapabilitiesException("No identity services exist, but shell keys are required.");
+                throw new UnsupportedOperationException("No identity services exist, but shell keys are required.");
 
             ShellKeySupport keySupport = identity.getShellKeySupport();
 
             if( keySupport == null )
-            	throw new CapabilitiesException("No shell key support exists, but shell keys are required.");
+            	throw new UnsupportedOperationException("No shell key support exists, but shell keys are required.");
             
             SSHKeypair keyPair = keySupport.getKeypair(shellKeyId);
             
@@ -183,7 +182,7 @@ public class CreateVirtualMachine extends VMOperation {
             VolumeSupport volumeSupport = computeServices.getVolumeSupport();
 
             if( volumeSupport == null )
-            	throw new CapabilitiesException("A root volume product is required, but no volume support exists.");
+            	throw new UnsupportedOperationException("A root volume product is required, but no volume support exists.");
 
             VolumeProduct rootVolumeProduct = null;
             
@@ -231,12 +230,12 @@ public class CreateVirtualMachine extends VMOperation {
             NetworkServices network = provider.getNetworkServices();
 
             if (network == null)
-            	throw new CapabilitiesException("No network services exist even though a VLAN is required for launching a VM.");
+            	throw new UnsupportedOperationException("No network services exist even though a VLAN is required for launching a VM.");
 
             VLANSupport vlanSupport = network.getVlanSupport();
 
             if (vlanSupport == null)
-            	throw new CapabilitiesException("No VLANs are supported in " + provider.getCloudName() + " event though a VLAN is required to launch a VM.");
+            	throw new UnsupportedOperationException("No VLANs are supported in " + provider.getCloudName() + " event though a VLAN is required to launch a VM.");
 
             VLAN vlan = vlanSupport.getVlan(vlanId);
 

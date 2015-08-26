@@ -7,7 +7,6 @@ import org.dasein.cloud.InternalException;
 import org.dasein.cloud.compute.Architecture;
 import org.dasein.cloud.compute.VirtualMachineProduct;
 
-import bds.clemson.nfv.exception.CapabilitiesException;
 import bds.clemson.nfv.exception.ConfigurationException;
 import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
@@ -28,7 +27,7 @@ public class ListVMProducts extends VMOperation {
 		operation.execute();
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, CapabilitiesException, ConfigurationException, ResourcesException, ExecutionException {
+    protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ConfigurationException, ResourcesException, ExecutionException {
     	super.executeInternal();
 
         // find a target architecture and VM product
@@ -42,7 +41,7 @@ public class ListVMProducts extends VMOperation {
         }
 
         if (targetArchitecture == null)
-        	throw new CapabilitiesException(provider.getCloudName() + " does not support the " + architectureName + " architecture.");
+        	throw new UnsupportedOperationException(provider.getCloudName() + " does not support the " + architectureName + " architecture.");
 
         for (VirtualMachineProduct product: vmSupport.listProducts(targetArchitecture)) {
         	System.out.println(product.getProviderProductId() + ", " + product.getName() + ", " + product.getDescription());
