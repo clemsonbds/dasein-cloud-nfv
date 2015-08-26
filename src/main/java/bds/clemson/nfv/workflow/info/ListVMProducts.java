@@ -4,11 +4,11 @@ import java.util.Properties;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
+import org.dasein.cloud.OperationNotSupportedException;
 import org.dasein.cloud.compute.Architecture;
 import org.dasein.cloud.compute.VirtualMachineProduct;
 
 import bds.clemson.nfv.exception.ConfigurationException;
-import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
@@ -27,7 +27,7 @@ public class ListVMProducts extends VMOperation {
 		operation.execute();
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ConfigurationException, ResourcesException, ExecutionException {
+    protected void executeInternal() throws InternalException, CloudException, ConfigurationException, ResourcesException, OperationNotSupportedException {
     	super.executeInternal();
 
         // find a target architecture and VM product

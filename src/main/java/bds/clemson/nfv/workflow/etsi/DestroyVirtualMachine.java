@@ -2,10 +2,10 @@ package bds.clemson.nfv.workflow.etsi;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
+import org.dasein.cloud.OperationNotSupportedException;
 import org.dasein.cloud.compute.VmState;
 
 import bds.clemson.nfv.exception.ConfigurationException;
-import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.workflow.VMStateChangeOperation;
 
@@ -24,7 +24,7 @@ public class DestroyVirtualMachine extends VMStateChangeOperation {
 		operation.execute();
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ExecutionException, ResourcesException, ConfigurationException {
+    protected void executeInternal() throws InternalException, CloudException, ResourcesException, ConfigurationException, OperationNotSupportedException {
     	super.executeInternal();
     	changeState(VmState.TERMINATED);
     }

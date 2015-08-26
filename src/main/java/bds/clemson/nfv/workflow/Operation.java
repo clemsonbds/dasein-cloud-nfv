@@ -9,10 +9,10 @@ import java.util.Properties;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.CloudProvider;
 import org.dasein.cloud.InternalException;
+import org.dasein.cloud.OperationNotSupportedException;
 
 import bds.clemson.nfv.ProviderLoader;
 import bds.clemson.nfv.exception.ConfigurationException;
-import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 
@@ -20,7 +20,7 @@ public abstract class Operation {
 	protected CloudProvider provider;
 
     protected abstract void mapProperties(Properties prop) throws UsageException;
-    protected abstract void executeInternal() throws UsageException, InternalException, CloudException, UnsupportedOperationException, ConfigurationException, ResourcesException, ExecutionException;
+    protected abstract void executeInternal() throws UsageException, InternalException, CloudException, ConfigurationException, ResourcesException, OperationNotSupportedException;
 
     protected void execute() {
 		try {
@@ -76,10 +76,6 @@ public abstract class Operation {
 		}
 	    catch (ResourcesException e) {
 	        System.err.println("An error occurred with the provider resources: " + e.getMessage());
-			e.printStackTrace();
-		}
-	    catch (ExecutionException e) {
-	        System.err.println("An error occurred with the execution: " + e.getMessage());
 			e.printStackTrace();
 		}
 	    catch( CloudException e ) {

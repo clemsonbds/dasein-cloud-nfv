@@ -7,7 +7,6 @@ import org.dasein.cloud.InternalException;
 import org.dasein.cloud.compute.VirtualMachine;
 import org.dasein.cloud.compute.VmState;
 
-import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.UsageException;
 
 public abstract class VMStateChangeOperation extends VMOperation {
@@ -17,7 +16,7 @@ public abstract class VMStateChangeOperation extends VMOperation {
 		vmId = Configuration.map(prop, "DSN_CMD_VMID", Configuration.Requirement.REQUIRED);
 	}
 
-	public void changeState(VmState targetState) throws InternalException, CloudException, ExecutionException {
+	public void changeState(VmState targetState) throws InternalException, CloudException {
 
         // find the vm and change its state
         VirtualMachine vm = vmSupport.getVirtualMachine(vmId);
@@ -25,7 +24,7 @@ public abstract class VMStateChangeOperation extends VMOperation {
         VmState currentState = vm.getCurrentState();
 
         if (currentState.equals(targetState))
-        	throw new ExecutionException("VM is already in state " + targetState);
+        	throw new CloudException("VM is already in state " + targetState);
 
         boolean canChangeState = false;
         
@@ -39,7 +38,7 @@ public abstract class VMStateChangeOperation extends VMOperation {
         }
 
         if (!canChangeState)
-        	throw new ExecutionException("VM cannot change to state " + targetState + " from state " + currentState);
+        	throw new CloudException("VM cannot change to state " + targetState + " from state " + currentState);
 
         switch (targetState) {
         case REBOOTING:		vmSupport.reboot(vmId);		break;

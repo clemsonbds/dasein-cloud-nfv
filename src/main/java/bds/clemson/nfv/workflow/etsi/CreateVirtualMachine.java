@@ -1,10 +1,10 @@
 package bds.clemson.nfv.workflow.etsi;
 
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
+import org.dasein.cloud.OperationNotSupportedException;
 import org.dasein.cloud.Requirement;
 import org.dasein.cloud.compute.Architecture;
 import org.dasein.cloud.compute.MachineImage;
@@ -30,7 +30,6 @@ import org.dasein.util.uom.storage.Gigabyte;
 import org.dasein.util.uom.storage.Storage;
 
 import bds.clemson.nfv.exception.ConfigurationException;
-import bds.clemson.nfv.exception.ExecutionException;
 import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
@@ -82,7 +81,7 @@ public class CreateVirtualMachine extends VMOperation {
 		System.out.println(operation.getLaunched().getProviderVirtualMachineId());
 	}
 
-    protected void executeInternal() throws InternalException, CloudException, UnsupportedOperationException, ExecutionException, ResourcesException, ConfigurationException {
+    protected void executeInternal() throws InternalException, CloudException, ResourcesException, ConfigurationException, OperationNotSupportedException {
     	super.executeInternal();
 
     	MachineImageSupport imageSupport = computeServices.getImageSupport();
@@ -279,7 +278,7 @@ public class CreateVirtualMachine extends VMOperation {
         }
 
         if( launching == null ) {
-            throw new ExecutionException("VM self-terminated before entering a usable state.");
+            throw new CloudException("VM self-terminated before entering a usable state.");
         }
 
         this.launched = launching;
