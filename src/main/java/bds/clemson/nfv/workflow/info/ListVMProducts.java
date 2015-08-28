@@ -18,8 +18,8 @@ public class ListVMProducts extends VMOperation {
 
 	private String architectureName;
 	
-	protected void mapProperties(Properties prop) throws UsageException {
-		architectureName = Configuration.map(prop, Configuration.Field.ARCHITECTURE_NAME, Configuration.Requirement.REQUIRED);
+	protected void mapProperties(Properties[] prop) throws UsageException {
+		architectureName = Configuration.map(prop, Configuration.Key.ARCHITECTURE_NAME, Configuration.Requirement.REQUIRED);
 	}
 	
 	public static void main(String[] args) {

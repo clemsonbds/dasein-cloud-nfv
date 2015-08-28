@@ -23,10 +23,10 @@ public class CreateNIC extends NetworkOperation {
 	private String description;
 	
 	
-	protected void mapProperties(Properties prop) throws UsageException {
-		subnetID = Configuration.map(prop, Configuration.Field.SUBNET_ID, Configuration.Requirement.REQUIRED);
-		name = Configuration.map(prop, Configuration.Field.NAME, Configuration.Requirement.REQUIRED);
-		description = Configuration.map(prop, Configuration.Field.DESCRIPTION, Configuration.Requirement.REQUIRED);
+	protected void mapProperties(Properties[] prop) throws UsageException {
+		subnetID = Configuration.map(prop, Configuration.Key.SUBNET_ID, Configuration.Requirement.REQUIRED);
+		name = Configuration.map(prop, Configuration.Key.NAME, Configuration.Requirement.REQUIRED);
+		description = Configuration.map(prop, Configuration.Key.DESCRIPTION, Configuration.Requirement.REQUIRED);
 				
 	}
 	

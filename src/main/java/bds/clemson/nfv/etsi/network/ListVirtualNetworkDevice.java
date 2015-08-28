@@ -16,7 +16,7 @@ import bds.clemson.nfv.workflow.network.NetworkOperation;
 public class ListVirtualNetworkDevice extends NetworkOperation {
 
 		
-	protected void mapProperties(Properties prop) throws UsageException {
+	protected void mapProperties(Properties[] prop) throws UsageException {
 	//none
 	}
 	

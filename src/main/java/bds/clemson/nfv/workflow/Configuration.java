@@ -5,7 +5,7 @@ import java.util.Properties;
 import bds.clemson.nfv.exception.UsageException;
 
 public class Configuration {
-	public enum Field {
+	public enum Key {
 		HOSTNAME,
 		NAME,
 		DESCRIPTION,
@@ -19,7 +19,7 @@ public class Configuration {
 		VOLUME_IOPS,
 
 		SHELL_USERNAME,
-		SHELL_KEY,
+		SHELL_KEY_NAME,
 		SHELL_PASSWORD,
 
 		VM_ID,
@@ -39,12 +39,16 @@ public class Configuration {
 		OPTIONAL
 	}
 
-	public static String map(Properties properties, Field field, Requirement required) throws UsageException {
-		String ret = properties.getProperty(field.toString());
+	public static String map(Properties[] propertiesSets, Key key, Requirement required) throws UsageException {
+		String value = null;
+		
+		for (Properties properties : propertiesSets)
+			if (properties.containsKey(key))
+				value = properties.getProperty(key.toString());
+		
+		if (value == null && required == Requirement.REQUIRED)
+			throw new UsageException("The property '" + key.toString() + "' is required.");
 
-		if (ret == null && required == Requirement.REQUIRED)
-			throw new UsageException("The property '" + field.toString() + "' is required.");
-
-		return ret;
+		return value;
 	}
 }

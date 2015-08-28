@@ -16,7 +16,7 @@ import bds.clemson.nfv.workflow.storage.VolumeOperation;
 public class ListVolumeProducts extends VolumeOperation {
 
 		
-	protected void mapProperties(Properties prop) throws UsageException {
+	protected void mapProperties(Properties[] prop) throws UsageException {
 	//none
 	}
 	

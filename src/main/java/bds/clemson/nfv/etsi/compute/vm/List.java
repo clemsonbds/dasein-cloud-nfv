@@ -14,7 +14,7 @@ import bds.clemson.nfv.workflow.compute.VMOperation;
 
 public class List extends VMOperation {
 
-	protected void mapProperties(Properties prop) throws UsageException {
+	protected void mapProperties(Properties[] prop) throws UsageException {
 		// none
 	}
 	

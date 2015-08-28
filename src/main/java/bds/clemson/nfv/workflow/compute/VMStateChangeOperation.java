@@ -13,8 +13,8 @@ import bds.clemson.nfv.workflow.Configuration;
 public abstract class VMStateChangeOperation extends VMOperation {
 	private String vmId;
 
-	protected void mapProperties(Properties prop) throws UsageException {
-		vmId = Configuration.map(prop, Configuration.Field.VM_ID, Configuration.Requirement.REQUIRED);
+	protected void mapProperties(Properties[] prop) throws UsageException {
+		vmId = Configuration.map(prop, Configuration.Key.VM_ID, Configuration.Requirement.REQUIRED);
 	}
 
 	public void changeState(VmState targetState) throws InternalException, CloudException {

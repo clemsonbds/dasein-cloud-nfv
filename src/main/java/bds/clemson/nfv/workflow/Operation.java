@@ -19,7 +19,7 @@ import bds.clemson.nfv.exception.UsageException;
 public abstract class Operation {
 	protected CloudProvider provider;
 
-    protected abstract void mapProperties(Properties prop) throws UsageException;
+    protected abstract void mapProperties(Properties[] prop) throws UsageException;
     protected abstract void executeInternal() throws UsageException, InternalException, CloudException, ConfigurationException, ResourcesException, OperationNotSupportedException;
 
     protected void execute() {
@@ -38,7 +38,13 @@ public abstract class Operation {
 			} catch (IOException e) {
 				throw new ConfigurationException("Unable to read properties file at " + providerPropertiesPath + ".");
 			}
-				
+
+	    	// parse environment variables to instance variables
+			// do once for the provider properties file
+			// and again for command line properties, let them override provider properties
+			Properties[] propertiesSets = {providerProperties, System.getProperties()};
+			mapProperties(propertiesSets);
+			
 	    	try {
 	    		ProviderLoader loader = new ProviderLoader(providerProperties);
 				provider = loader.getConfiguredProvider();
@@ -55,9 +61,6 @@ public abstract class Operation {
 	    	catch (UnsupportedEncodingException e) {
 				throw new ConfigurationException(e.getMessage());
 			}
-
-	    	// parse environment variables to instance variables
-			mapProperties(System.getProperties());
 
 	    	// execute command
 	    	executeInternal();
