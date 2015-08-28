@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.OperationNotSupportedException;
+import org.dasein.cloud.Requirement;
 import org.dasein.cloud.compute.Volume;
 import org.dasein.cloud.compute.VolumeCreateOptions;
 import org.dasein.cloud.compute.VolumeState;
@@ -26,11 +27,11 @@ public class CreateVolume extends VolumeOperation {
     private Integer iops;
 	
 	protected void mapProperties(Properties[] prop) throws UsageException {
-		productId = Configuration.map(prop, Configuration.Key.VOLUME_PRODUCT_NAME, Configuration.Requirement.REQUIRED);
-		VolumeName = Configuration.map(prop, Configuration.Key.NAME, Configuration.Requirement.REQUIRED);
-		VolumeDes = Configuration.map(prop, Configuration.Key.DESCRIPTION, Configuration.Requirement.REQUIRED);
-		capacity = Integer.parseInt(Configuration.map(prop, Configuration.Key.VOLUME_CAPACITY, Configuration.Requirement.REQUIRED));
-		iops = Integer.parseInt(Configuration.map(prop, Configuration.Key.VOLUME_IOPS, Configuration.Requirement.REQUIRED));
+		productId = Configuration.map(prop, Configuration.Key.VOLUME_PRODUCT_NAME, Requirement.REQUIRED);
+		VolumeName = Configuration.map(prop, Configuration.Key.NAME, Requirement.REQUIRED);
+		VolumeDes = Configuration.map(prop, Configuration.Key.DESCRIPTION, Requirement.REQUIRED);
+		capacity = Integer.parseInt(Configuration.map(prop, Configuration.Key.VOLUME_CAPACITY, Requirement.REQUIRED));
+		iops = Integer.parseInt(Configuration.map(prop, Configuration.Key.VOLUME_IOPS, Requirement.REQUIRED));
 		
 	}
 	

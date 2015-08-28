@@ -2,6 +2,8 @@ package bds.clemson.nfv.workflow;
 
 import java.util.Properties;
 
+import org.dasein.cloud.Requirement;
+
 import bds.clemson.nfv.exception.UsageException;
 
 public class Configuration {
@@ -34,19 +36,14 @@ public class Configuration {
 		}
 	}
 	
-	public enum Requirement {
-		REQUIRED,
-		OPTIONAL
-	}
-
-	public static String map(Properties[] propertiesSets, Key key, Requirement required) throws UsageException {
+	public static String map(Properties[] propertiesSets, Key key, Requirement requirement) throws UsageException {
 		String value = null;
 		
 		for (Properties properties : propertiesSets)
-			if (properties.containsKey(key))
+			if (properties.containsKey(key.toString()))
 				value = properties.getProperty(key.toString());
 		
-		if (value == null && required == Requirement.REQUIRED)
+		if (value == null && requirement == Requirement.REQUIRED)
 			throw new UsageException("The property '" + key.toString() + "' is required.");
 
 		return value;

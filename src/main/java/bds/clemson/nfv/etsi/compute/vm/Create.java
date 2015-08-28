@@ -58,18 +58,18 @@ public class Create extends VMOperation {
 	private VirtualMachine launched;
 
 	protected void mapProperties(Properties[] prop) throws UsageException {
-		hostName = Configuration.map(prop, Configuration.Key.HOSTNAME, Configuration.Requirement.OPTIONAL);
-		friendlyName = Configuration.map(prop, Configuration.Key.NAME, Configuration.Requirement.REQUIRED);
-		description = Configuration.map(prop, Configuration.Key.DESCRIPTION, Configuration.Requirement.OPTIONAL);
-		architectureName = Configuration.map(prop, Configuration.Key.ARCHITECTURE_NAME, Configuration.Requirement.REQUIRED);
-		productName = Configuration.map(prop, Configuration.Key.VM_PRODUCT_NAME, Configuration.Requirement.REQUIRED);
-		machineImageId = Configuration.map(prop, Configuration.Key.IMAGE_NAME, Configuration.Requirement.REQUIRED);
-		shellUsername = Configuration.map(prop, Configuration.Key.SHELL_USERNAME, Configuration.Requirement.OPTIONAL);
-		shellKeyId = Configuration.map(prop, Configuration.Key.SHELL_KEY_NAME, Configuration.Requirement.OPTIONAL);
-		shellPassword = Configuration.map(prop, Configuration.Key.SHELL_PASSWORD, Configuration.Requirement.OPTIONAL);
-		rootVolumeProductId = Configuration.map(prop, Configuration.Key.VOLUME_PRODUCT_NAME, Configuration.Requirement.OPTIONAL);
-		vlanId = Configuration.map(prop, Configuration.Key.VLAN_ID, Configuration.Requirement.OPTIONAL);
-		subnetId = Configuration.map(prop, Configuration.Key.SUBNET_ID, Configuration.Requirement.OPTIONAL);
+		hostName = Configuration.map(prop, Configuration.Key.HOSTNAME, Requirement.OPTIONAL);
+		friendlyName = Configuration.map(prop, Configuration.Key.NAME, Requirement.REQUIRED);
+		description = Configuration.map(prop, Configuration.Key.DESCRIPTION, Requirement.OPTIONAL);
+		architectureName = Configuration.map(prop, Configuration.Key.ARCHITECTURE_NAME, Requirement.REQUIRED);
+		productName = Configuration.map(prop, Configuration.Key.VM_PRODUCT_NAME, Requirement.REQUIRED);
+		machineImageId = Configuration.map(prop, Configuration.Key.IMAGE_NAME, Requirement.REQUIRED);
+		shellUsername = Configuration.map(prop, Configuration.Key.SHELL_USERNAME, Requirement.OPTIONAL);
+		shellKeyId = Configuration.map(prop, Configuration.Key.SHELL_KEY_NAME, Requirement.OPTIONAL);
+		shellPassword = Configuration.map(prop, Configuration.Key.SHELL_PASSWORD, Requirement.OPTIONAL);
+		rootVolumeProductId = Configuration.map(prop, Configuration.Key.VOLUME_PRODUCT_NAME, Requirement.OPTIONAL);
+		vlanId = Configuration.map(prop, Configuration.Key.VLAN_ID, Requirement.OPTIONAL);
+		subnetId = Configuration.map(prop, Configuration.Key.SUBNET_ID, Requirement.OPTIONAL);
 	}
 	
 	public static void main(String[] args) throws UnsupportedOperationException {

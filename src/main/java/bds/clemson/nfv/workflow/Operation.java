@@ -39,12 +39,6 @@ public abstract class Operation {
 				throw new ConfigurationException("Unable to read properties file at " + providerPropertiesPath + ".");
 			}
 
-	    	// parse environment variables to instance variables
-			// do once for the provider properties file
-			// and again for command line properties, let them override provider properties
-			Properties[] propertiesSets = {providerProperties, System.getProperties()};
-			mapProperties(propertiesSets);
-			
 	    	try {
 	    		ProviderLoader loader = new ProviderLoader(providerProperties);
 				provider = loader.getConfiguredProvider();
@@ -61,6 +55,12 @@ public abstract class Operation {
 	    	catch (UnsupportedEncodingException e) {
 				throw new ConfigurationException(e.getMessage());
 			}
+
+	    	// parse environment variables to instance variables
+			// do once for the provider properties file
+			// and again for command line properties, let them override provider properties
+			Properties[] propertiesSets = {providerProperties, System.getProperties()};
+			mapProperties(propertiesSets);
 
 	    	// execute command
 	    	executeInternal();

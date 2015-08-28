@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.OperationNotSupportedException;
+import org.dasein.cloud.Requirement;
 import org.dasein.cloud.network.NICCreateOptions;
 import org.dasein.cloud.network.NICState;
 import org.dasein.cloud.network.NetworkInterface;
@@ -24,9 +25,9 @@ public class CreateNIC extends NetworkOperation {
 	
 	
 	protected void mapProperties(Properties[] prop) throws UsageException {
-		subnetID = Configuration.map(prop, Configuration.Key.SUBNET_ID, Configuration.Requirement.REQUIRED);
-		name = Configuration.map(prop, Configuration.Key.NAME, Configuration.Requirement.REQUIRED);
-		description = Configuration.map(prop, Configuration.Key.DESCRIPTION, Configuration.Requirement.REQUIRED);
+		subnetID = Configuration.map(prop, Configuration.Key.SUBNET_ID, Requirement.REQUIRED);
+		name = Configuration.map(prop, Configuration.Key.NAME, Requirement.REQUIRED);
+		description = Configuration.map(prop, Configuration.Key.DESCRIPTION, Requirement.REQUIRED);
 				
 	}
 	

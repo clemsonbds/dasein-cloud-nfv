@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.OperationNotSupportedException;
+import org.dasein.cloud.Requirement;
 import org.dasein.cloud.compute.Architecture;
 import org.dasein.cloud.compute.ImageClass;
 import org.dasein.cloud.compute.ImageFilterOptions;
@@ -23,7 +24,7 @@ public class ListMachineImages extends VMOperation {
 	private String architectureName;
 	
 	protected void mapProperties(Properties[] prop) throws UsageException {
-		architectureName = Configuration.map(prop, Configuration.Key.ARCHITECTURE_NAME, Configuration.Requirement.REQUIRED);
+		architectureName = Configuration.map(prop, Configuration.Key.ARCHITECTURE_NAME, Requirement.REQUIRED);
 	}
 	
 	public static void main(String[] args) {

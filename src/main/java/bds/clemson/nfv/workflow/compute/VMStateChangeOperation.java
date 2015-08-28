@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
+import org.dasein.cloud.Requirement;
 import org.dasein.cloud.compute.VirtualMachine;
 import org.dasein.cloud.compute.VmState;
 
@@ -14,7 +15,7 @@ public abstract class VMStateChangeOperation extends VMOperation {
 	private String vmId;
 
 	protected void mapProperties(Properties[] prop) throws UsageException {
-		vmId = Configuration.map(prop, Configuration.Key.VM_ID, Configuration.Requirement.REQUIRED);
+		vmId = Configuration.map(prop, Configuration.Key.VM_ID, Requirement.REQUIRED);
 	}
 
 	public void changeState(VmState targetState) throws InternalException, CloudException {

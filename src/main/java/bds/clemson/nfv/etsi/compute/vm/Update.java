@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.OperationNotSupportedException;
+import org.dasein.cloud.Requirement;
 import org.dasein.cloud.compute.VirtualMachine;
 
 import bds.clemson.nfv.exception.ConfigurationException;
@@ -22,9 +23,9 @@ public class Update extends VMOperation {
 	@Override
 	protected void mapProperties(Properties[] prop) throws UsageException {
 		// TODO Auto-generated method stub
-		vmId = Configuration.map(prop, Configuration.Key.VM_ID, Configuration.Requirement.REQUIRED);
-		operation = Configuration.map(prop, Configuration.Key.OPERATION, Configuration.Requirement.REQUIRED);
-		device = Configuration.map(prop, Configuration.Key.DEVICE_ID, Configuration.Requirement.REQUIRED);
+		vmId = Configuration.map(prop, Configuration.Key.VM_ID, Requirement.REQUIRED);
+		operation = Configuration.map(prop, Configuration.Key.OPERATION, Requirement.REQUIRED);
+		device = Configuration.map(prop, Configuration.Key.DEVICE_ID, Requirement.REQUIRED);
 	}
 
 	public static void main(String[] args) {
