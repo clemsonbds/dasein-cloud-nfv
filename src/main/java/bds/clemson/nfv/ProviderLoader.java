@@ -18,14 +18,22 @@
  */
 package bds.clemson.nfv;
 
+import org.apache.commons.io.IOUtils;
 import org.dasein.cloud.*;
+import org.dasein.cloud.ProviderContext.Value;
+
+import bds.clemson.nfv.exception.ConfigurationException;
 
 import javax.annotation.Nonnull;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 
@@ -56,7 +64,7 @@ import java.util.Properties;
 public class ProviderLoader {
     private CloudProvider configuredProvider;
 
-    public ProviderLoader(Properties properties) throws ClassNotFoundException, IllegalAccessException, InstantiationException, CloudException, InternalException, UnsupportedEncodingException {
+    public ProviderLoader(Properties properties) throws CloudException, InternalException, ConfigurationException, IllegalAccessException, InstantiationException {
         configure(properties);
     }
 
@@ -65,7 +73,7 @@ public class ProviderLoader {
     }
 
     @SuppressWarnings("unchecked")
-	private void configure(Properties properties) throws ClassNotFoundException, IllegalAccessException, InstantiationException, CloudException, InternalException, UnsupportedEncodingException {
+	private void configure(Properties properties) throws CloudException, InternalException, ConfigurationException, IllegalAccessException, InstantiationException {
 
     	// First, read the basic configuration data from system properties
         String cname = properties.getProperty("DSN_PROVIDER_CLASS");
@@ -80,7 +88,7 @@ public class ProviderLoader {
 		try {
 			cloud = Cloud.register(providerName, cloudName, endpoint, (Class<? extends CloudProvider>)Class.forName(cname));
 		} catch (ClassNotFoundException e) {
-			throw new ClassNotFoundException("Unrecognized provider name '" + cname + "', is the jar included?");
+			throw new ConfigurationException("Unrecognized provider name '" + cname + "', is the jar included?");
 		}
 
         // Find what additional fields are necessary to connect to the cloud
@@ -95,21 +103,58 @@ public class ProviderLoader {
 //            System.out.print("Loading '" + f.name + "' from ");
             if( f.type.equals(ContextRequirements.FieldType.KEYPAIR) ) {
 //                System.out.println("'DSN_" + f.name + "_SHARED' and 'DSN_" + f.name + "_SECRET'");
-                String shared = properties.getProperty("DSN_" + f.name + "_SHARED");
-                String secret = properties.getProperty("DSN_" + f.name + "_SECRET");
 
-                values[i] = ProviderContext.Value.parseValue(f, shared, secret);
+            	String sharedProperty = "DSN_" + f.name + "_SHARED";
+            	String secretProperty = "DSN_" + f.name + "_SECRET";
+        		String shared = properties.getProperty(sharedProperty);
+        		String secret = properties.getProperty(secretProperty);
+
+        		if (shared == null || secret == null)
+        			throw new ConfigurationException("Both " + sharedProperty + " and " + secretProperty + " properties are required.");
+        		
+        		// special case for p12 certificate (as in Google Cloud), from
+            	// https://groups.google.com/forum/#!topic/dasein-cloud/vAFgSZR09y0
+            	if (f.name.equals("p12Certificate")) {
+        			byte[][] bytes = new byte[2][];
+
+           			try {
+						bytes[0] = Files.readAllBytes(Paths.get(shared));
+					} catch (IOException e) {
+						throw new ConfigurationException(e.getMessage());
+					}
+        			
+           			bytes[1] = secret.getBytes();
+
+           			values[i] = new Value<byte[][]>(f.name, bytes);
+            	}
+            	else {
+            		try {
+						values[i] = ProviderContext.Value.parseValue(f, shared, secret);
+					} catch (UnsupportedEncodingException e) {
+						throw new ConfigurationException(e.getMessage());
+					}
+            	}
             }
             else {
 //                System.out.println("'DSN_" + f.name + "'");
-                String value = properties.getProperty("DSN_" + f.name);
+            	String propertyName = "DSN_" + f.name;
+                String value = properties.getProperty(propertyName);
 
-                values[i] = ProviderContext.Value.parseValue(f, value);
+                if (value == null && f.required)
+                	throw new ConfigurationException("The " + propertyName + " property is required.");
+                
+                try {
+					values[i] = ProviderContext.Value.parseValue(f, value);
+				} catch (UnsupportedEncodingException e) {
+					throw new ConfigurationException(e.getMessage());
+				}
             }
             i++;
         }
 
+        
         ProviderContext ctx = cloud.createContext(account, regionId, values);
         configuredProvider = ctx.connect();
+        
     }
 }

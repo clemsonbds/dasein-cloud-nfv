@@ -43,17 +43,11 @@ public abstract class Operation {
 	    		ProviderLoader loader = new ProviderLoader(providerProperties);
 				provider = loader.getConfiguredProvider();
 			}
-	    	catch (ClassNotFoundException e) {
-				throw new UsageException("Provider " + providerProperties.getProperty("DSN_PROVIDER_CLASS", "<null>") + " not found, is the JAR in the classpath?");
-	    	}
 			catch (IllegalAccessException e) {
 				throw new InternalException(e);
 			}
 			catch (InstantiationException e) {
 				throw new InternalException(e);
-			}
-	    	catch (UnsupportedEncodingException e) {
-				throw new ConfigurationException(e.getMessage());
 			}
 
 	    	// parse environment variables to instance variables
