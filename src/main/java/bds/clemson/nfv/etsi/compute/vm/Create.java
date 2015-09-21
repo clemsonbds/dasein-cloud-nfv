@@ -53,6 +53,7 @@ public class Create extends VMOperation {
 	private String rootVolumeProductId;
 	private String vlanId;
 	private String subnetId;
+	private String datacenterId;
 	
 
 	private VirtualMachine launched;
@@ -70,6 +71,7 @@ public class Create extends VMOperation {
 		rootVolumeProductId = Configuration.map(prop, Configuration.Key.VOLUME_PRODUCT_NAME, Requirement.OPTIONAL);
 		vlanId = Configuration.map(prop, Configuration.Key.VLAN_ID, Requirement.OPTIONAL);
 		subnetId = Configuration.map(prop, Configuration.Key.SUBNET_ID, Requirement.OPTIONAL);
+		datacenterId = Configuration.map(prop, Configuration.Key.DATACENTER_ID, Requirement.OPTIONAL);
 	}
 	
 	public static void main(String[] args) throws UnsupportedOperationException {
@@ -99,18 +101,20 @@ public class Create extends VMOperation {
 
         if (product == null)
         	throw new ResourcesException(provider.getCloudName() + " does not have a '" + productName + "' VM product.");
-        
-        boolean supported = false;
-        
-        for (Architecture architecture : product.getArchitectures())
-        	if (architecture.equals(targetArchitecture)) {
-        		supported = true;
-        		break;
-        	}
 
-        if (supported == false)
-        	throw new ResourcesException("The '" + productName + "' product is not available for the " + targetArchitecture + " architecture.");
+        if (product.getArchitectures().length != 0) { // Google doesn't attach supported architectures
+        	boolean supported = false;
         
+        	for (Architecture architecture : product.getArchitectures())
+        		if (architecture.equals(targetArchitecture)) {
+        			supported = true;
+        			break;
+        		}
+
+        	if (supported == false)
+        		throw new ResourcesException("The '" + productName + "' product is not available for the " + targetArchitecture + " architecture.");
+        }
+        	
         MachineImage image = imageSupport.getImage(machineImageId);
 
         if (image == null)
@@ -132,7 +136,17 @@ public class Create extends VMOperation {
         	description != null ? description : friendlyName
         );
 
-        Requirement req = vmSupport.getCapabilities().identifyShellKeyRequirement(platform);
+        Requirement req = vmSupport.getCapabilities().identifyDataCenterLaunchRequirement();
+
+        if (req.equals(Requirement.REQUIRED)
+         || (req.equals(Requirement.OPTIONAL) && datacenterId != null)) {
+        	if (datacenterId == null)
+        		throw new ConfigurationException("No datacenter ID provided, but is required.");
+        	
+        	options.inDataCenter(datacenterId);
+        }
+        
+        req = vmSupport.getCapabilities().identifyShellKeyRequirement(platform);
         
     	if (req.equals(Requirement.REQUIRED)
     	 || (req.equals(Requirement.OPTIONAL) && shellKeyId != null)) {
@@ -260,10 +274,15 @@ public class Create extends VMOperation {
                 if (!subnet.getCurrentState().equals(SubnetState.AVAILABLE))
                 	throw new ResourcesException("Subnet " + subnetId + " is not available.");
 
-                options.inSubnet(null, vlan.getProviderDataCenterId(), vlan.getProviderVlanId(), subnet.getProviderSubnetId());
+                options.inSubnet(null,
+                	options.getDataCenterId() != null ? options.getDataCenterId() : vlan.getProviderDataCenterId(),
+                	vlan.getProviderVlanId(),
+                	subnet.getProviderSubnetId());
             }
             else {
-                options.inVlan(null, vlan.getProviderDataCenterId(), vlan.getProviderVlanId());
+                options.inVlan(null,
+                	options.getDataCenterId() != null ? options.getDataCenterId() : vlan.getProviderDataCenterId(),
+                	vlan.getProviderVlanId());
             }
         }
 

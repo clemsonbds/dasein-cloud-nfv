@@ -28,6 +28,7 @@ public class Configuration {
 		VLAN_ID,
 		SUBNET_ID,
 		DEVICE_ID,
+		DATACENTER_ID,
 
 		OPERATION;
 
