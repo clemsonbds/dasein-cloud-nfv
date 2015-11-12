@@ -1,4 +1,4 @@
-package bds.clemson.nfv.etsi.storage;
+package bds.clemson.nfv.etsi.hypervisor.vmstorage;
 
 import java.util.Properties;
 
@@ -18,7 +18,7 @@ import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
 import bds.clemson.nfv.workflow.storage.VolumeOperation;
 
-public class CreateVolume extends VolumeOperation {
+public class Create extends VolumeOperation {
 
 	private String productId;
 	private String VolumeName;
@@ -36,7 +36,7 @@ public class CreateVolume extends VolumeOperation {
 	}
 	
 	public static void main(String[] args) {
-		CreateVolume operation = new CreateVolume();
+		Create operation = new Create();
 		operation.execute();
 	}
 

@@ -1,8 +1,9 @@
-package bds.clemson.nfv.etsi.compute.vm;
+package bds.clemson.nfv.etsi.hypervisor.vm;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.OperationNotSupportedException;
+import org.dasein.cloud.compute.VirtualMachine;
 import org.dasein.cloud.compute.VmState;
 
 import bds.clemson.nfv.exception.ConfigurationException;
@@ -10,22 +11,27 @@ import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.workflow.compute.VMStateChangeOperation;
 
 /**
- * will start the VM instance 
- * example provider name "AWS"
- * example input arguments are virtual machine id "i-790cb7bc"
+ * Maps to ETSI GS NFV-MAN 001 7.6.2 "Save a virtual machine" 
+ * uses Dasein's "suspend"
  * 
- * @author uagarwa
+ * @author rakurai
  */
 
-public class Start extends VMStateChangeOperation {
+public class Save extends VMStateChangeOperation {
 
 	public static void main(String[] args) throws UnsupportedOperationException {
-		Start operation = new Start();
+		Save operation = new Save();
 		operation.execute();
 	}
 
     protected void executeInternal() throws InternalException, CloudException, ResourcesException, ConfigurationException, OperationNotSupportedException {
     	super.executeInternal();
-    	changeState(VmState.RUNNING);
+        
+        VmState currentState = vmSupport.getVirtualMachine(vmId).getCurrentState();
+
+        if (vmSupport.getCapabilities().canSuspend(currentState))
+        	throw new CloudException("VM cannot save from state " + currentState);
+
+        vmSupport.suspend(vmId);
     }
 }

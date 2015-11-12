@@ -1,4 +1,4 @@
-package bds.clemson.nfv.etsi.network;
+package bds.clemson.nfv.etsi.hypervisor.vnd;
 
 import java.util.Properties;
 
@@ -13,7 +13,7 @@ import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.network.NetworkOperation;
 
 
-public class ListVirtualNetworkDevice extends NetworkOperation {
+public class List extends NetworkOperation {
 
 		
 	protected void mapProperties(Properties[] prop) throws UsageException {
@@ -21,7 +21,7 @@ public class ListVirtualNetworkDevice extends NetworkOperation {
 	}
 	
 	public static void main(String[] args) {
-		ListVirtualNetworkDevice operation = new ListVirtualNetworkDevice();
+		List operation = new List();
 		operation.execute();
 	}
 

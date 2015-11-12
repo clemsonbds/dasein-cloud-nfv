@@ -1,4 +1,4 @@
-package bds.clemson.nfv.etsi.compute.vm;
+package bds.clemson.nfv.etsi.hypervisor.vm;
 
 import java.util.Properties;
 
@@ -13,6 +13,13 @@ import bds.clemson.nfv.exception.ResourcesException;
 import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
 import bds.clemson.nfv.workflow.compute.VMOperation;
+
+/**
+ * Maps to ETSI GS NFV-MAN 001 7.6.2 "Update a virtual machine" 
+ * 
+ * 
+ * @author rakurai
+ */
 
 public class Update extends VMOperation {
 

@@ -1,4 +1,4 @@
-package bds.clemson.nfv.etsi.network;
+package bds.clemson.nfv.etsi.hypervisor.vnd;
 
 import java.util.Properties;
 
@@ -17,7 +17,7 @@ import bds.clemson.nfv.workflow.Configuration;
 import bds.clemson.nfv.workflow.network.NetworkOperation;
 
 
-public class CreateNIC extends NetworkOperation {
+public class Create extends NetworkOperation {
 	
 	private String subnetID;
 	private String name;
@@ -32,7 +32,7 @@ public class CreateNIC extends NetworkOperation {
 	}
 	
 	public static void main(String[] args) {
-		CreateNIC operation = new CreateNIC();
+		Create operation = new Create();
 		operation.execute();
 	}
 

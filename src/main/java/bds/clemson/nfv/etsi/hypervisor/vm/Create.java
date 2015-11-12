@@ -1,4 +1,4 @@
-package bds.clemson.nfv.etsi.compute.vm;
+package bds.clemson.nfv.etsi.hypervisor.vm;
 
 import java.util.Properties;
 
