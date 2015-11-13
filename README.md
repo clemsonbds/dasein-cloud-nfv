@@ -22,3 +22,10 @@ Below are the compute operations implemented and a short description of what the
 | Restore | Resume a VM |
 | List | List the VM for specific cloud provider |
 | Query | Not implemented |
+
+| Storage Operations | Description                                    |
+|--------------------|------------------------------------------------|
+| Create             | Creates and starts a storage pool              |
+| Delete             | Deletes a specified storage pool               |
+| List               | Lists the storage pool known to the hypervisor |
+| Query              |                                                |
