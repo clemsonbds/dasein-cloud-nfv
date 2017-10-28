@@ -18,25 +18,25 @@ import bds.clemson.nfv.exception.UsageException;
 import bds.clemson.nfv.workflow.Configuration;
 import bds.clemson.nfv.workflow.storage.VolumeOperation;
 
-public class Create extends VolumeOperation {
+public class Delete extends VolumeOperation {
 
 	private String productId;
-	private String name;
-	private String description;
+	private String VolumeName;
+	private String VolumeDes;
 	private Integer capacity;
     private Integer iops;
 	
 	protected void mapProperties(Properties[] prop) throws UsageException {
 		productId = Configuration.map(prop, Configuration.Key.VOLUME_PRODUCT_NAME, Requirement.REQUIRED);
-		name = Configuration.map(prop, Configuration.Key.NAME, Requirement.REQUIRED);
-		description = Configuration.map(prop, Configuration.Key.DESCRIPTION, Requirement.REQUIRED);
-		capacity = Integer.parseInt(Configuration.map(prop, Configuration.Key.VOLUME_CAPACITY, Requirement.REQUIRED));
+		VolumeName = Configuration.map(prop, Configuration.Key.NAME, Requirement.REQUIRED);
+		VolumeDes = Configuration.map(prop, Configuration.Key.DESCRIPTION, Requirement.REQUIRED);
+		capacity = Integer.parseInt(Configuration.map(prop, Configuration.Key.VOLUME_CAPACITY_GB, Requirement.REQUIRED));
 		iops = Integer.parseInt(Configuration.map(prop, Configuration.Key.VOLUME_IOPS, Requirement.REQUIRED));
 		
 	}
 	
 	public static void main(String[] args) {
-		Create operation = new Create();
+		Delete operation = new Delete();
 		operation.execute();
 	}
 
@@ -45,7 +45,7 @@ public class Create extends VolumeOperation {
          
       
 		Storage<Gigabyte> size = new Storage<Gigabyte>(capacity, Storage.GIGABYTE); 
-        VolumeCreateOptions options = VolumeCreateOptions.getInstance(productId, size, name, description, iops);
+        VolumeCreateOptions options = VolumeCreateOptions.getInstance(productId, size, VolumeName, VolumeDes, iops);
         String volumeId = volumeSupport.createVolume(options); 
         Volume vol = volumeSupport.getVolume(volumeId);
 
